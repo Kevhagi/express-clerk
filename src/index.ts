@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
-import { clerkClient, clerkMiddleware, getAuth, requireAuth } from '@clerk/express'
+import { clerkMiddleware } from '@clerk/express'
 import { initDatabase } from './models'
 import apiRoutes from './routes'
 
@@ -37,24 +37,6 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api', apiRoutes)
 
-// Use requireAuth() to protect this route
-// If user is not authenticated, requireAuth() will redirect back to the homepage
-app.get('/protected', requireAuth(), async (req, res) => {
-  // Use `getAuth()` to get the user's `userId`
-  // or you can use `req.auth`
-  const { userId } = getAuth(req)
-
-  // Use Clerk's JavaScript Backend SDK to get the user's User object
-  const user = await clerkClient.users.getUser(userId)
-
-  res.json({ user })
-})
-
-// Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
-app.get('/sign-in', (req, res) => {
-  res.render('sign-in')
-})
-
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err)
@@ -63,8 +45,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   })
 })
-
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' })
 })
@@ -77,8 +57,7 @@ const startServer = async () => {
     
     // Start the server
     app.listen(PORT, () => {
-      console.log(`🚀 Server running at http://localhost:${PORT}`)
-      console.log(`📊 API endpoints available at http://localhost:${PORT}/api`)
+      console.log(`🚀 Server running at port ${PORT}`)
       console.log(`💾 Database connected and models synchronized`)
     })
   } catch (error) {
