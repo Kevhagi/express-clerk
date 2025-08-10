@@ -7,6 +7,7 @@ import itemRoutes from './itemRoutes';
 import transactionRoutes from './transactionRoutes';
 import transactionItemRoutes from './transactionItemRoutes';
 import transactionExpenseRoutes from './transactionExpenseRoutes';
+import dashboardRoutes from './dashboardRoutes';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/items', itemRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/transaction-items', transactionItemRoutes);
 router.use('/transaction-expenses', transactionExpenseRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;

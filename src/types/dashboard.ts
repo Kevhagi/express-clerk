@@ -1,0 +1,25 @@
+export type ChangeType = 'UP' | 'DOWN';
+
+export interface ChangeData {
+  type: ChangeType;
+  percentage: number;
+}
+
+export interface MetricData {
+  amount: number;
+  change: ChangeData;
+  verdict: string;
+}
+
+export interface DashboardPeriod {
+  sales: MetricData;
+  purchase: MetricData;
+  expense: MetricData;
+  profit: MetricData;
+  balance: MetricData;
+}
+
+export interface DashboardData {
+  daily: DashboardPeriod;
+  monthly: DashboardPeriod;
+}

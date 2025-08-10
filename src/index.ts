@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from 'cors'
 import { clerkMiddleware } from '@clerk/express'
 import { initDatabase } from './models'
 import apiRoutes from './routes'
@@ -12,6 +13,28 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(clerkMiddleware())
 
+// !! TODO: Setup CORS properly
+app.use(cors())
+// const allowedOrigins = [
+//   'http://localhost:3000', // Next.js local dev
+//   'https://yourdomain.com' // Production domain
+// ];
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Allow requests with no origin (like mobile apps or curl)
+//     if (!origin) return callback(null, true);
+
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     } else {
+//       return callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true // needed if using cookies/auth headers
+// }));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' })
@@ -22,6 +45,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the Clerk Express Quickstart with Sequelize!',
     endpoints: {
+      dashboard: '/api/dashboard',
       users: '/api/users',
       contacts: '/api/contacts',
       brands: '/api/brands',
