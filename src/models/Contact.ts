@@ -3,18 +3,18 @@ import sequelize from '../config/database';
 import { IContact } from '../types';
 
 class Contact extends Model<IContact> implements IContact {
-  public id!: number;
+  public id!: string;
   public name!: string;
   public phone!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Contact.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {

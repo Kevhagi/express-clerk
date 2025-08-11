@@ -3,25 +3,25 @@ import sequelize from '../config/database';
 import { ITransactionItem } from '../types';
 
 class TransactionItem extends Model<ITransactionItem> implements ITransactionItem {
-  public id!: number;
-  public transaction_id!: number;
-  public item_id!: number;
+  public id!: string;
+  public transaction_id!: string;
+  public item_id!: string;
   public unit_price!: number;
-  public qty!: number;
+  public qty: number;
   public subtotal!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 TransactionItem.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     transaction_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'transactions',
@@ -29,7 +29,7 @@ TransactionItem.init(
       },
     },
     item_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'items',

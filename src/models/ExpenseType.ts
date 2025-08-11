@@ -3,17 +3,17 @@ import sequelize from '../config/database';
 import { IExpenseType } from '../types';
 
 class ExpenseType extends Model<IExpenseType> implements IExpenseType {
-  public id!: number;
+  public id!: string;
   public name!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 ExpenseType.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {

@@ -3,7 +3,7 @@ import sequelize from '../config/database';
 import { IUser } from '../types';
 
 class User extends Model<IUser> implements IUser {
-  public id!: number;
+  public id!: string;
   public firstName!: string;
   public lastName!: string;
   public readonly createdAt!: Date;

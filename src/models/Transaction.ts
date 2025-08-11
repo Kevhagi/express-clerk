@@ -3,27 +3,27 @@ import sequelize from '../config/database';
 import { ITransaction, TransactionType } from '../types';
 
 class Transaction extends Model<ITransaction> implements ITransaction {
-  public id!: number;
-  public user_id!: number;
-  public supplier_id?: number;
-  public customer_id?: number;
+  public id!: string;
+  public user_id!: string;
+  public supplier_id?: string;
+  public customer_id?: string;
   public type!: TransactionType;
   public total!: number;
   public transaction_date!: Date;
   public notes?: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Transaction.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     user_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'users',
@@ -31,7 +31,7 @@ Transaction.init(
       },
     },
     supplier_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: {
         model: 'contacts',
@@ -39,7 +39,7 @@ Transaction.init(
       },
     },
     customer_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: {
         model: 'contacts',

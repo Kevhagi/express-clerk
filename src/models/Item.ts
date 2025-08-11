@@ -3,25 +3,25 @@ import sequelize from '../config/database';
 import { IItem } from '../types';
 
 class Item extends Model<IItem> implements IItem {
-  public id!: number;
-  public brand_id!: number;
+  public id!: string;
+  public brand_id!: string;
   public model_name!: string;
   public ram_gb!: number;
   public storage_gb!: number;
   public display_name!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Item.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     brand_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'brands',
@@ -42,7 +42,7 @@ Item.init(
     },
     display_name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

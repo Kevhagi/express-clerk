@@ -4,6 +4,8 @@ import cors from 'cors'
 import { clerkMiddleware } from '@clerk/express'
 import { initDatabase } from './models'
 import apiRoutes from './routes'
+import { seedBrands } from './seeders/seedBrands'
+import { seedItems } from './seeders/seedItems'
 
 const app = express()
 const PORT = process.env.PORT || 3002
@@ -13,8 +15,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(clerkMiddleware())
 
-// !! TODO: Setup CORS properly
 app.use(cors())
+
+// !! TODO: Setup CORS properly
 // const allowedOrigins = [
 //   'http://localhost:3000', // Next.js local dev
 //   'https://yourdomain.com' // Production domain
@@ -34,6 +37,19 @@ app.use(cors())
 //   allowedHeaders: ['Content-Type', 'Authorization'],
 //   credentials: true // needed if using cookies/auth headers
 // }));
+
+// !! CORS setup - allow all origins for development
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*')
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+  
+//   if (req.method === 'OPTIONS') {
+//     res.sendStatus(200)
+//   } else {
+//     next()
+//   }
+// })
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -78,6 +94,22 @@ const startServer = async () => {
   try {
     // Initialize database connection and sync models
     await initDatabase()
+    
+    // Seed initial data
+    // console.log('🌱 Starting data seeding...')
+    // if (process.env.NODE_ENV === 'development') {
+    //   try {
+    //     await seedBrands()
+    //     console.log('✅ Brands seeded successfully')
+        
+    //     await seedItems()
+    //     console.log('✅ Items seeded successfully')
+        
+    //     console.log('🎉 All seeding completed successfully!')
+    //   } catch (seedingError) {
+    //     console.warn('⚠️  Seeding failed, but server will continue:', seedingError)
+    //   }
+    // }
     
     // Start the server
     app.listen(PORT, () => {

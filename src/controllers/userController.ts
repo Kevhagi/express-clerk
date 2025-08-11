@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { User } from '../models';
+import { UserService } from '../services';
 import { CreateUserDTO, UpdateUserDTO } from '../types';
 
 // GET /api/users - Get all users
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await User.findAll();
+    const users = await UserService.findAll();
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users', details: error });
@@ -16,7 +16,13 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const user = await User.findByPk(id);
+    
+    if (!id) {
+      res.status(400).json({ error: 'Invalid user ID' });
+      return;
+    }
+    
+    const user = await UserService.findById(id);
     
     if (!user) {
       res.status(404).json({ error: 'User not found' });
@@ -39,7 +45,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData: CreateUserDTO = req.body;
-    const user = await User.create(userData);
+    const user = await UserService.create(userData);
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ error: 'Failed to create user', details: error });
@@ -58,16 +64,18 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const { id } = req.params;
     const updateData: UpdateUserDTO = req.body;
     
-    const [updatedRowsCount] = await User.update(updateData, {
-      where: { id },
-    });
+    if (!id) {
+      res.status(400).json({ error: 'Invalid user ID' });
+      return;
+    }
     
-    if (updatedRowsCount === 0) {
+    const updatedUser = await UserService.update(id, updateData);
+    
+    if (!updatedUser) {
       res.status(404).json({ error: 'User not found' });
       return;
     }
     
-    const updatedUser = await User.findByPk(id);
     res.json(updatedUser);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update user', details: error });
@@ -78,11 +86,15 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedRowsCount = await User.destroy({
-      where: { id },
-    });
     
-    if (deletedRowsCount === 0) {
+    if (!id) {
+      res.status(400).json({ error: 'Invalid user ID' });
+      return;
+    }
+    
+    const deleted = await UserService.delete(id);
+    
+    if (!deleted) {
       res.status(404).json({ error: 'User not found' });
       return;
     }

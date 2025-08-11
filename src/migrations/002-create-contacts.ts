@@ -3,8 +3,8 @@ import { QueryInterface, DataTypes } from 'sequelize';
 export const up = async (queryInterface: QueryInterface) => {
   await queryInterface.createTable('contacts', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {
@@ -15,12 +15,12 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,

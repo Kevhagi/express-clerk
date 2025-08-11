@@ -3,12 +3,12 @@ import { QueryInterface, DataTypes } from 'sequelize';
 export const up = async (queryInterface: QueryInterface) => {
   await queryInterface.createTable('transaction_items', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     transaction_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'transactions',
@@ -18,7 +18,7 @@ export const up = async (queryInterface: QueryInterface) => {
       onDelete: 'CASCADE',
     },
     item_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'items',
@@ -39,12 +39,12 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,

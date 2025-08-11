@@ -3,8 +3,7 @@ import { QueryInterface, DataTypes } from 'sequelize';
 export const up = async (queryInterface: QueryInterface) => {
   await queryInterface.createTable('users', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     firstName: {

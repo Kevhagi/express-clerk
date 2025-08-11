@@ -3,25 +3,25 @@ import sequelize from '../config/database';
 import { ITransactionExpense } from '../types';
 
 class TransactionExpense extends Model<ITransactionExpense> implements ITransactionExpense {
-  public id!: number;
-  public transaction_id!: number;
-  public expense_type_id!: number;
+  public id!: string;
+  public transaction_id!: string;
+  public expense_type_id!: string;
   public amount!: number;
   public notes?: string;
   public subtotal!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 TransactionExpense.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     transaction_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'transactions',
@@ -29,7 +29,7 @@ TransactionExpense.init(
       },
     },
     expense_type_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'expense_types',

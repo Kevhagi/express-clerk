@@ -2,21 +2,26 @@ import { Sequelize } from 'sequelize';
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'clerk_express_db',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   define: {
     timestamps: true,
-    underscored: false,
+    underscored: true,
+    freezeTableName: true,
   },
   dialectOptions: {
     ssl: { 
       require: true, 
       rejectUnauthorized: false 
     },
+    // ssl: process.env.NODE_ENV === 'production' ? {
+    //   require: true,
+    //   rejectUnauthorized: false
+    // } : false,
   },
 });
 

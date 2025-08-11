@@ -3,17 +3,17 @@ import sequelize from '../config/database';
 import { IBrand } from '../types';
 
 class Brand extends Model<IBrand> implements IBrand {
-  public id!: number;
+  public id!: string;
   public name!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Brand.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {
