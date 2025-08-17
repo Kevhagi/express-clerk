@@ -1,180 +1,82 @@
-export interface IUser {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { IUser, CreateUserDTO, UpdateUserDTO } from "./user";
+import { IContact, CreateContactDTO, UpdateContactDTO } from "./contact";
+import { IBrand, CreateBrandDTO, UpdateBrandDTO } from "./brand";
+import { IItem, CreateItemDTO, UpdateItemDTO } from "./item";
+import {
+  ITransaction,
+  CreateTransactionDTO,
+  UpdateTransactionDTO,
+  TransactionType,
+} from "./transaction";
+import {
+  ITransactionItem,
+  CreateTransactionItemDTO,
+  UpdateTransactionItemDTO,
+} from "./transaction";
+import {
+  ITransactionExpense,
+  CreateTransactionExpenseDTO,
+  UpdateTransactionExpenseDTO,
+} from "./transaction";
+import {
+  IExpenseType,
+  CreateExpenseTypeDTO,
+  UpdateExpenseTypeDTO,
+} from "./expense";
+import {
+  DashboardData,
+  DashboardPeriod,
+  MetricData,
+  ChangeData,
+  ChangeType,
+} from "./dashboard";
 
-export interface IContact {
-  id?: string;
-  name: string;
-  phone: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+export {
+  // User
+  IUser,
+  CreateUserDTO,
+  UpdateUserDTO,
 
-export interface IBrand {
-  id?: string;
-  name: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Contact
+  IContact,
+  CreateContactDTO,
+  UpdateContactDTO,
 
-export interface IItem {
-  id?: string;
-  brand_id: string;
-  model_name: string;
-  ram_gb: number;
-  storage_gb: number;
-  display_name: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Brand
+  IBrand,
+  CreateBrandDTO,
+  UpdateBrandDTO,
 
-export interface IExpenseType {
-  id?: string;
-  name: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Item
+  IItem,
+  CreateItemDTO,
+  UpdateItemDTO,
 
-export type TransactionType = 'Penjualan' | 'Pembelian';
+  // Transaction
+  ITransaction,
+  CreateTransactionDTO,
+  UpdateTransactionDTO,
+  TransactionType,
 
-export interface ITransaction {
-  id?: string;
-  user_id: string;
-  supplier_id?: string;
-  customer_id?: string;
-  type: TransactionType;
-  total: number;
-  transaction_date: Date;
-  notes?: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Transaction Item
+  ITransactionItem,
+  CreateTransactionItemDTO,
+  UpdateTransactionItemDTO,
 
-export interface ITransactionItem {
-  id?: string;
-  transaction_id: string;
-  item_id: string;
-  unit_price: number;
-  qty: number;
-  subtotal: number;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Transaction Expense
+  ITransactionExpense,
+  CreateTransactionExpenseDTO,
+  UpdateTransactionExpenseDTO,
 
-export interface ITransactionExpense {
-  id?: string;
-  transaction_id: string;
-  expense_type_id: string;
-  amount: number;
-  notes?: string;
-  subtotal: number;
-  created_at?: Date;
-  updated_at?: Date;
-}
+  // Expense Type
+  IExpenseType,
+  CreateExpenseTypeDTO,
+  UpdateExpenseTypeDTO,
 
-// DTOs for API requests (without auto-generated fields)
-export interface CreateUserDTO {
-  firstName: string;
-  lastName: string;
-}
-
-export interface UpdateUserDTO {
-  firstName?: string;
-  lastName?: string;
-}
-
-export interface CreateContactDTO {
-  name: string;
-  phone: string;
-}
-
-export interface UpdateContactDTO {
-  name?: string;
-  phone?: string;
-}
-
-export interface CreateBrandDTO {
-  name: string;
-}
-
-export interface UpdateBrandDTO {
-  name?: string;
-}
-
-export interface CreateItemDTO {
-  brand_id: string;
-  model_name: string;
-  ram_gb: number;
-  storage_gb: number;
-}
-
-export interface UpdateItemDTO {
-  brand_id?: string;
-  model_name?: string;
-  ram_gb?: number;
-  storage_gb?: number;
-}
-
-export interface CreateExpenseTypeDTO {
-  name: string;
-}
-
-export interface UpdateExpenseTypeDTO {
-  name?: string;
-}
-
-export interface CreateTransactionDTO {
-  user_id: string;
-  supplier_id?: string;
-  customer_id?: string;
-  type: TransactionType;
-  total: number;
-  transaction_date: Date;
-  notes?: string;
-}
-
-export interface UpdateTransactionDTO {
-  user_id?: string;
-  supplier_id?: string;
-  customer_id?: string;
-  type?: TransactionType;
-  total?: number;
-  transaction_date?: Date;
-  notes?: string;
-}
-
-export interface CreateTransactionItemDTO {
-  transaction_id: string;
-  item_id: string;
-  unit_price: number;
-  qty: number;
-  subtotal: number;
-}
-
-export interface UpdateTransactionItemDTO {
-  transaction_id?: string;
-  item_id?: string;
-  unit_price?: number;
-  qty?: number;
-  subtotal?: number;
-}
-
-export interface CreateTransactionExpenseDTO {
-  transaction_id: string;
-  expense_type_id: string;
-  amount: number;
-  notes?: string;
-  subtotal: number;
-}
-
-export interface UpdateTransactionExpenseDTO {
-  transaction_id?: string;
-  expense_type_id?: string;
-  amount?: number;
-  notes?: string;
-  subtotal?: number;
-}
+  // Dashboard
+  DashboardData,
+  DashboardPeriod,
+  MetricData,
+  ChangeData,
+  ChangeType,
+};
