@@ -16,7 +16,8 @@ export interface DashboardPeriod {
   purchase: MetricData;
   expense: MetricData;
   profit: MetricData;
-  balance: MetricData;
+  initial_balance: MetricData;
+  final_balance: MetricData;
 }
 
 export interface DashboardData {

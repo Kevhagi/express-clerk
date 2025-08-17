@@ -5,6 +5,8 @@ export interface IItem {
     ram_gb: number;
     storage_gb: number;
     display_name: string;
+    created_by: string;
+    updated_by: string;
     created_at?: Date;
     updated_at?: Date;
 }
@@ -14,6 +16,7 @@ export interface CreateItemDTO {
     model_name: string;
     ram_gb: number;
     storage_gb: number;
+    created_by: string;
 }
   
   export interface UpdateItemDTO {
@@ -21,4 +24,5 @@ export interface CreateItemDTO {
     model_name?: string;
     ram_gb?: number;
     storage_gb?: number;
+    updated_by: string;
 }

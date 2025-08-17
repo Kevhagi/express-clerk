@@ -5,6 +5,8 @@ import { IExpenseType } from '../types';
 class ExpenseType extends Model<IExpenseType> implements IExpenseType {
   public id!: string;
   public name!: string;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -17,6 +19,14 @@ ExpenseType.init(
       primaryKey: true,
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
       type: DataTypes.STRING,
       allowNull: false,
     },

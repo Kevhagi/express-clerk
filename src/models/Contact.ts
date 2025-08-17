@@ -6,6 +6,8 @@ class Contact extends Model<IContact> implements IContact {
   public id!: string;
   public name!: string;
   public phone!: string;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -22,6 +24,14 @@ Contact.init(
       allowNull: false,
     },
     phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
       type: DataTypes.STRING,
       allowNull: false,
     },

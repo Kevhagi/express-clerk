@@ -9,6 +9,8 @@ class TransactionItem extends Model<ITransactionItem> implements ITransactionIte
   public unit_price!: number;
   public qty: number;
   public subtotal!: number;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -46,6 +48,14 @@ TransactionItem.init(
     },
     subtotal: {
       type: DataTypes.DECIMAL(15, 2),
+      allowNull: false,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     created_at: {

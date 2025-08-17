@@ -11,6 +11,8 @@ class Transaction extends Model<ITransaction> implements ITransaction {
   public total!: number;
   public transaction_date!: Date;
   public notes?: string;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -61,6 +63,14 @@ Transaction.init(
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,

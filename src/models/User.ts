@@ -6,6 +6,8 @@ class User extends Model<IUser> implements IUser {
   public id!: string;
   public firstName!: string;
   public lastName!: string;
+  public createdBy!: string;
+  public updatedBy!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -22,6 +24,14 @@ User.init(
       allowNull: false,
     },
     lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updatedBy: {
       type: DataTypes.STRING,
       allowNull: false,
     },

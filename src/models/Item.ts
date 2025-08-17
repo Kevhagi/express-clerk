@@ -9,6 +9,8 @@ class Item extends Model<IItem> implements IItem {
   public ram_gb!: number;
   public storage_gb!: number;
   public display_name!: string;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -43,6 +45,14 @@ Item.init(
     display_name: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,

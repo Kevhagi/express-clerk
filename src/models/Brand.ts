@@ -5,6 +5,8 @@ import { IBrand } from '../types';
 class Brand extends Model<IBrand> implements IBrand {
   public id!: string;
   public name!: string;
+  public created_by!: string;
+  public updated_by!: string;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }
@@ -17,6 +19,14 @@ Brand.init(
       primaryKey: true,
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updated_by: {
       type: DataTypes.STRING,
       allowNull: false,
     },
