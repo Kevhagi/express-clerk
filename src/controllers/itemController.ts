@@ -1,20 +1,61 @@
 import { Request, Response } from 'express';
 import { Item, Brand } from '../models';
 import { CreateItemDTO, UpdateItemDTO } from '../types';
+import { Op } from 'sequelize';
 
 // GET /api/items - Get all items with brand information
 export const getAllItems = async (req: Request, res: Response): Promise<void> => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+
+    // Optional search parameters
+    const { model_name, brand_id } = req.query;
+
+    // Build where clause conditionally
+    const whereClause: any = {};
+    
+    if (model_name) {
+      whereClause.model_name = {
+        [Op.like]: `%${model_name}%`,
+      };
+    }
+    
+    if (brand_id) {
+      // Handle both single brand_id and array of brand_ids
+      const brandIds = Array.isArray(brand_id) ? brand_id : [brand_id];
+      whereClause.brand_id = {
+        [Op.in]: brandIds,
+      };
+    }
+
+    // Get total count with same filters
+    const total = await Item.count({
+      where: whereClause,
+    });
+
+    // Get items with pagination and optional filters
     const items = await Item.findAll({
       include: [
         {
           model: Brand,
           as: 'brand',
-          attributes: ['id', 'name'],
+          attributes: ['name'],
         },
       ],
+      where: whereClause,
+      order: [['brand', 'name', 'ASC'], ['model_name', 'ASC']],
+      limit,
+      offset,
     });
-    res.json(items);
+
+    res.json({
+      data: items,
+      total,
+      page,
+      limit,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch items', details: error });
   }
@@ -29,7 +70,7 @@ export const getItemById = async (req: Request, res: Response): Promise<void> =>
         {
           model: Brand,
           as: 'brand',
-          attributes: ['id', 'name'],
+          attributes: ['name'],
         },
       ],
     });
@@ -39,22 +80,15 @@ export const getItemById = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     
-    res.json(item);
+    res.json({
+      data: item
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch item', details: error });
   }
 };
 
 // POST /api/items - Create new item
-/* Sample request body:
-{
-  "brand_id": 1,
-  "model_name": "iPhone 15 Pro",
-  "ram_gb": 8,
-  "storage_gb": 256,
-  "display_name": "iPhone 15 Pro 256GB"
-}
-*/
 export const createItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const itemData: CreateItemDTO = req.body;
@@ -66,33 +100,27 @@ export const createItem = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
+    // TODO: Validate itemData before creating
     const item = await Item.create(itemData);
-    const createdItem = await Item.findByPk(item.id, {
+    const createdItem = await Item.findByPk(item.dataValues.id, {
       include: [
         {
           model: Brand,
           as: 'brand',
-          attributes: ['id', 'name'],
+          attributes: ['name'],
         },
       ],
     });
     
-    res.status(201).json(createdItem);
+    res.status(201).json({
+      data: createdItem
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create item', details: error });
   }
 };
 
 // PUT /api/items/:id - Update item
-/* Sample request body:
-{
-  "brand_id": 1,
-  "model_name": "iPhone 15 Pro Max",
-  "ram_gb": 8,
-  "storage_gb": 512,
-  "display_name": "iPhone 15 Pro Max 512GB"
-}
-*/
 export const updateItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -121,12 +149,14 @@ export const updateItem = async (req: Request, res: Response): Promise<void> => 
         {
           model: Brand,
           as: 'brand',
-          attributes: ['id', 'name'],
+          attributes: ['name'],
         },
       ],
     });
     
-    res.json(updatedItem);
+    res.json({
+      data: updatedItem
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update item', details: error });
   }
@@ -145,7 +175,7 @@ export const deleteItem = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
-    res.status(204).send();
+    res.status(200).send();
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete item', details: error });
   }
