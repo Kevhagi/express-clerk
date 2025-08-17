@@ -48,12 +48,22 @@ TransactionExpense.init(
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    },
   },
   {
     sequelize,
     modelName: 'TransactionExpense',
     tableName: 'transaction_expenses',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

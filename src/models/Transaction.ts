@@ -62,12 +62,22 @@ Transaction.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    },
   },
   {
     sequelize,
     modelName: 'Transaction',
     tableName: 'transactions',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

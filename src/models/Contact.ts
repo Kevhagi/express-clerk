@@ -25,12 +25,22 @@ Contact.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    },
   },
   {
     sequelize,
     modelName: 'Contact',
     tableName: 'contacts',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

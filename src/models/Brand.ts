@@ -20,12 +20,22 @@ Brand.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    },
   },
   {
     sequelize,
     modelName: 'Brand',
     tableName: 'brands',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 
