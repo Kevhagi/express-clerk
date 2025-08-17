@@ -7,7 +7,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
     const dashboardData: DashboardData = {
       daily: {
         sales: {
-          amount: 50_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 20
@@ -15,7 +15,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Penjualan meningkat dibanding kemarin'
         },
         purchase: {
-          amount: 30_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 20
@@ -23,7 +23,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Pembelian meningkat dibanding kemarin'
         },
         expense: {
-          amount: 10_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'DOWN',
             percentage: 12.5
@@ -31,7 +31,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Biaya meningkat dibanding kemarin'
         },
         profit: {
-          amount: 2_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 4.5
@@ -39,7 +39,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Profit meningkat dibanding kemarin'
         },
         balance: {
-          amount: 45_678,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 12.5
@@ -49,7 +49,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
       },
       monthly: {
         sales: {
-          amount: 1_500_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 15
@@ -57,7 +57,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Penjualan meningkat dibanding bulan lalu'
         },
         purchase: {
-          amount: 900_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 10
@@ -65,7 +65,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Pembelian meningkat dibanding bulan lalu'
         },
         expense: {
-          amount: 300_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 8
@@ -73,7 +73,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Biaya meningkat dibanding bulan lalu'
         },
         profit: {
-          amount: 300_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 5
@@ -81,7 +81,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
           verdict: 'Profit meningkat dibanding bulan lalu'
         },
         balance: {
-          amount: 1_200_000_000,
+          amount: Math.floor(Math.random() * 10_000_000),
           change: {
             type: 'UP',
             percentage: 10
