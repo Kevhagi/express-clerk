@@ -5,8 +5,25 @@ import { CreateBrandDTO, UpdateBrandDTO } from '../types';
 // GET /api/brands - Get all brands
 export const getAllBrands = async (req: Request, res: Response): Promise<void> => {
   try {
-    const brands = await Brand.findAll();
-    res.json(brands);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 100;
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const total = await Brand.count();
+
+    const brands = await Brand.findAll({
+      limit,
+      offset,
+      order: [['name', 'ASC']],
+    });
+
+    res.json({
+      data: brands,
+      total,
+      page,
+      limit,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch brands', details: error });
   }
@@ -23,7 +40,9 @@ export const getBrandById = async (req: Request, res: Response): Promise<void> =
       return;
     }
     
-    res.json(brand);
+    res.json({
+      data: brand
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch brand', details: error });
   }
@@ -38,8 +57,14 @@ export const getBrandById = async (req: Request, res: Response): Promise<void> =
 export const createBrand = async (req: Request, res: Response): Promise<void> => {
   try {
     const brandData: CreateBrandDTO = req.body;
+
+    // TODO: Validate brandData before creating
     const brand = await Brand.create(brandData);
-    res.status(201).json(brand);
+    const createdBrand = await Brand.findByPk(brand.dataValues.id);
+
+    res.status(201).json({
+      data: createdBrand
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create brand', details: error });
   }
@@ -66,7 +91,9 @@ export const updateBrand = async (req: Request, res: Response): Promise<void> =>
     }
     
     const updatedBrand = await Brand.findByPk(id);
-    res.json(updatedBrand);
+    res.json({
+      data: updatedBrand
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update brand', details: error });
   }
@@ -85,7 +112,7 @@ export const deleteBrand = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     
-    res.status(204).send();
+    res.status(200).send();
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete brand', details: error });
   }
