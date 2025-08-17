@@ -1,51 +1,26 @@
 import { Request, Response } from 'express';
-import { Contact } from '../models';
+import { ContactService } from '../services';
 import { CreateContactDTO, UpdateContactDTO } from '../types';
-import { Op } from 'sequelize';
 
 // GET /api/contacts - Get all contacts with pagination and search
 export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const offset = (page - 1) * limit;
-
-    // Optional search parameters
     const { name, phone } = req.query;
 
-    // Build where clause conditionally
-    const whereClause: any = {};
-    
-    if (name) {
-      whereClause.name = {
-        [Op.like]: `%${name}%`,
-      };
-    }
-    
-    if (phone) {
-      whereClause.phone = {
-        [Op.like]: `%${phone}%`,
-      };
-    }
-
-    // Get total count with same filters
-    const total = await Contact.count({
-      where: whereClause,
-    });
-
-    // Get contacts with pagination and optional filters
-    const contacts = await Contact.findAll({
-      where: whereClause,
-      order: [['name', 'ASC']],
-      limit,
-      offset,
-    });
+    const result = await ContactService.findWithPagination(
+      page, 
+      limit, 
+      name as string, 
+      phone as string
+    );
 
     res.json({
-      data: contacts,
-      total,
-      page,
-      limit,
+      data: result.contacts,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch contacts', details: error });
@@ -56,7 +31,7 @@ export const getAllContacts = async (req: Request, res: Response): Promise<void>
 export const getContactById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const contact = await Contact.findByPk(id);
+    const contact = await ContactService.findById(id);
     
     if (!contact) {
       res.status(404).json({ error: 'Contact not found' });
@@ -82,68 +57,37 @@ export const createContact = async (req: Request, res: Response): Promise<void> 
   try {
     const contactData: CreateContactDTO = req.body;
     
-    // Check for existing contact with same name
-    const existingNameContact = await Contact.findOne({
-      where: {
-        name: contactData.name,
-      },
-    });
+    // Check for duplicates using service
+    const duplicateCheck = await ContactService.checkForDuplicates(contactData);
     
-    if (existingNameContact) {
+    if (duplicateCheck.hasNameDuplicate) {
       res.status(409).json({ 
         error: 'Contact name already exists', 
         message: 'A contact with this name already exists',
-        existingContact: {
-          id: existingNameContact.dataValues.id,
-          name: existingNameContact.dataValues.name,
-          phone: existingNameContact.dataValues.phone,
-        }
+        existingContact: duplicateCheck.existingContacts.name
       });
       return;
     }
     
-    // Check for existing contact with same phone number
-    const existingPhoneContact = await Contact.findOne({
-      where: {
-        phone: contactData.phone,
-      },
-    });
-    
-    if (existingPhoneContact) {
+    if (duplicateCheck.hasPhoneDuplicate) {
       res.status(409).json({ 
         error: 'Phone number already exists', 
         message: 'A contact with this phone number already exists',
-        existingContact: {
-          id: existingPhoneContact.dataValues.id,
-          name: existingPhoneContact.dataValues.name,
-          phone: existingPhoneContact.dataValues.phone,
-        }
+        existingContact: duplicateCheck.existingContacts.phone
       });
       return;
     }
     
-    // Check for existing contact with same name and phone combination
-    const existingNamePhoneContact = await Contact.findOne({
-      where: {
-        name: contactData.name,
-        phone: contactData.phone,
-      },
-    });
-    
-    if (existingNamePhoneContact) {
+    if (duplicateCheck.hasCombinationDuplicate) {
       res.status(409).json({ 
         error: 'Contact already exists', 
         message: 'A contact with this name and phone number combination already exists',
-        existingContact: {
-          id: existingNamePhoneContact.dataValues.id,
-          name: existingNamePhoneContact.dataValues.name,
-          phone: existingNamePhoneContact.dataValues.phone,
-        }
+        existingContact: duplicateCheck.existingContacts.combination
       });
       return;
     }
     
-    const contact = await Contact.create(contactData);
+    const contact = await ContactService.create(contactData);
     res.status(201).json({
       data: contact
     });
@@ -165,94 +109,50 @@ export const updateContact = async (req: Request, res: Response): Promise<void> 
     const updateData: UpdateContactDTO = req.body;
     
     // Get the current contact to compare with updates
-    const currentContact = await Contact.findByPk(id);
+    const currentContact = await ContactService.findById(id);
     if (!currentContact) {
       res.status(404).json({ error: 'Contact not found' });
       return;
     }
     
-    // Check for duplicate name if name is being updated
-    if (updateData.name && updateData.name !== currentContact.name) {
-      const existingNameContact = await Contact.findOne({
-        where: {
-          name: updateData.name,
-          id: { [Op.ne]: id }, // Exclude current contact from check
-        },
+    // Check for duplicates using service (excluding current contact)
+    const duplicateCheck = await ContactService.checkForDuplicates(updateData, id);
+    
+    if (updateData.name && updateData.name !== currentContact.name && duplicateCheck.hasNameDuplicate) {
+      res.status(409).json({ 
+        error: 'Contact name already exists', 
+        message: 'A contact with this name already exists',
+        existingContact: duplicateCheck.existingContacts.name
       });
-      
-      if (existingNameContact) {
-        res.status(409).json({ 
-          error: 'Contact name already exists', 
-          message: 'A contact with this name already exists',
-          existingContact: {
-            id: existingNameContact.dataValues.id,
-            name: existingNameContact.dataValues.name,
-            phone: existingNameContact.dataValues.phone,
-          }
-        });
-        return;
-      }
+      return;
     }
     
-    // Check for duplicate phone number if phone is being updated
-    if (updateData.phone && updateData.phone !== currentContact.phone) {
-      const existingPhoneContact = await Contact.findOne({
-        where: {
-          phone: updateData.phone,
-          id: { [Op.ne]: id }, // Exclude current contact from check
-        },
+    if (updateData.phone && updateData.phone !== currentContact.phone && duplicateCheck.hasPhoneDuplicate) {
+      res.status(409).json({ 
+        error: 'Phone number already exists', 
+        message: 'A contact with this phone number already exists',
+        existingContact: duplicateCheck.existingContacts.phone
       });
-      
-      if (existingPhoneContact) {
-        res.status(409).json({ 
-          error: 'Phone number already exists', 
-          message: 'A contact with this phone number already exists',
-          existingContact: {
-            id: existingPhoneContact.dataValues.id,
-            name: existingPhoneContact.dataValues.name,
-            phone: existingPhoneContact.dataValues.phone,
-          }
-        });
-        return;
-      }
+      return;
     }
     
-    // Check for duplicate name and phone combination if either is being updated
-    if ((updateData.name && updateData.name !== currentContact.name) || 
-        (updateData.phone && updateData.phone !== currentContact.phone)) {
-      
-      const existingNamePhoneContact = await Contact.findOne({
-        where: {
-          name: updateData.name || currentContact.name,
-          phone: updateData.phone || currentContact.phone,
-          id: { [Op.ne]: id }, // Exclude current contact from check
-        },
+    if (((updateData.name && updateData.name !== currentContact.name) || 
+         (updateData.phone && updateData.phone !== currentContact.phone)) && 
+        duplicateCheck.hasCombinationDuplicate) {
+      res.status(409).json({ 
+        error: 'Contact already exists', 
+        message: 'A contact with this name and phone number combination already exists',
+        existingContact: duplicateCheck.existingContacts.combination
       });
-      
-      if (existingNamePhoneContact) {
-        res.status(409).json({ 
-          error: 'Contact already exists', 
-          message: 'A contact with this name and phone number combination already exists',
-          existingContact: {
-            id: existingNamePhoneContact.dataValues.id,
-            name: existingNamePhoneContact.dataValues.name,
-            phone: existingNamePhoneContact.dataValues.phone,
-          }
-        });
-        return;
-      }
+      return;
     }
     
-    const [updatedRowsCount] = await Contact.update(updateData, {
-      where: { id },
-    });
-    
-    if (updatedRowsCount === 0) {
+    const updatedContact = await ContactService.update(id, updateData);
+    if (!updatedContact) {
       res.status(404).json({ error: 'Contact not found' });
       return;
     }
     
-    const updatedContact = await Contact.findByPk(id);
     res.json({
       data: updatedContact
     });
@@ -267,16 +167,18 @@ export const deleteContact = async (req: Request, res: Response): Promise<void> 
     const { id } = req.params;
     
     // Check if contact exists before attempting to delete
-    const existingContact = await Contact.findByPk(id);
+    const existingContact = await ContactService.findById(id);
     if (!existingContact) {
       res.status(404).json({ error: 'Contact not found' });
       return;
     }
     
-    // Delete the contact - this should succeed since we verified it exists
-    await Contact.destroy({
-      where: { id },
-    });
+    // Delete the contact using service
+    const deleted = await ContactService.delete(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Contact not found' });
+      return;
+    }
     
     res.status(200).json({ message: 'Contact deleted successfully' });
   } catch (error) {

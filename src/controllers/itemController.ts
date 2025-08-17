@@ -1,60 +1,26 @@
 import { Request, Response } from 'express';
-import { Item, Brand } from '../models';
+import { ItemService } from '../services';
 import { CreateItemDTO, UpdateItemDTO } from '../types';
-import { Op } from 'sequelize';
 
 // GET /api/items - Get all items with brand information
 export const getAllItems = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const offset = (page - 1) * limit;
-
-    // Optional search parameters
     const { model_name, brand_id } = req.query;
 
-    // Build where clause conditionally
-    const whereClause: any = {};
-    
-    if (model_name) {
-      whereClause.model_name = {
-        [Op.like]: `%${model_name}%`,
-      };
-    }
-    
-    if (brand_id) {
-      // Handle both single brand_id and array of brand_ids
-      const brandIds = Array.isArray(brand_id) ? brand_id : [brand_id];
-      whereClause.brand_id = {
-        [Op.in]: brandIds,
-      };
-    }
-
-    // Get total count with same filters
-    const total = await Item.count({
-      where: whereClause,
-    });
-
-    // Get items with pagination and optional filters
-    const items = await Item.findAll({
-      include: [
-        {
-          model: Brand,
-          as: 'brand',
-          attributes: ['name'],
-        },
-      ],
-      where: whereClause,
-      order: [['brand', 'name', 'ASC'], ['model_name', 'ASC']],
-      limit,
-      offset,
-    });
+    const result = await ItemService.findWithPagination(
+      page, 
+      limit, 
+      model_name as string, 
+      brand_id as string | string[]
+    );
 
     res.json({
-      data: items,
-      total,
-      page,
-      limit,
+      data: result.items,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch items', details: error });
@@ -65,15 +31,7 @@ export const getAllItems = async (req: Request, res: Response): Promise<void> =>
 export const getItemById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const item = await Item.findByPk(id, {
-      include: [
-        {
-          model: Brand,
-          as: 'brand',
-          attributes: ['name'],
-        },
-      ],
-    });
+    const item = await ItemService.findById(id);
     
     if (!item) {
       res.status(404).json({ error: 'Item not found' });
@@ -93,27 +51,21 @@ export const createItem = async (req: Request, res: Response): Promise<void> => 
   try {
     const itemData: CreateItemDTO = req.body;
     
-    // Verify brand exists
-    const brand = await Brand.findByPk(itemData.brand_id);
-    if (!brand) {
+    // Verify brand exists using service
+    const brandExists = await ItemService.checkBrandExists(itemData.brand_id);
+    if (!brandExists) {
       res.status(400).json({ error: 'Brand not found' });
       return;
     }
     
-    // TODO: Validate itemData before creating
-    const item = await Item.create(itemData);
-    const createdItem = await Item.findByPk(item.dataValues.id, {
-      include: [
-        {
-          model: Brand,
-          as: 'brand',
-          attributes: ['name'],
-        },
-      ],
-    });
+    // Create item using service
+    const createdItem = await ItemService.create(itemData);
+    
+    // Get the created item with brand information
+    const itemWithBrand = await ItemService.findById(createdItem.id!);
     
     res.status(201).json({
-      data: createdItem
+      data: itemWithBrand
     });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create item', details: error });
@@ -128,34 +80,25 @@ export const updateItem = async (req: Request, res: Response): Promise<void> => 
     
     // Verify brand exists if brand_id is being updated
     if (updateData.brand_id) {
-      const brand = await Brand.findByPk(updateData.brand_id);
-      if (!brand) {
+      const brandExists = await ItemService.checkBrandExists(updateData.brand_id);
+      if (!brandExists) {
         res.status(400).json({ error: 'Brand not found' });
         return;
       }
     }
     
-    const [updatedRowsCount] = await Item.update(updateData, {
-      where: { id },
-    });
-    
-    if (updatedRowsCount === 0) {
+    // Update item using service
+    const updatedItem = await ItemService.update(id, updateData);
+    if (!updatedItem) {
       res.status(404).json({ error: 'Item not found' });
       return;
     }
     
-    const updatedItem = await Item.findByPk(id, {
-      include: [
-        {
-          model: Brand,
-          as: 'brand',
-          attributes: ['name'],
-        },
-      ],
-    });
+    // Get the updated item with brand information
+    const itemWithBrand = await ItemService.findById(id);
     
     res.json({
-      data: updatedItem
+      data: itemWithBrand
     });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update item', details: error });
@@ -166,16 +109,22 @@ export const updateItem = async (req: Request, res: Response): Promise<void> => 
 export const deleteItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedRowsCount = await Item.destroy({
-      where: { id },
-    });
     
-    if (deletedRowsCount === 0) {
+    // Check if item exists before attempting to delete
+    const existingItem = await ItemService.findById(id);
+    if (!existingItem) {
       res.status(404).json({ error: 'Item not found' });
       return;
     }
     
-    res.status(200).send();
+    // Delete item using service
+    const deleted = await ItemService.delete(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Item not found' });
+      return;
+    }
+    
+    res.status(200).json({ message: 'Item deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete item', details: error });
   }

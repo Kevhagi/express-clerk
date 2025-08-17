@@ -156,4 +156,77 @@ export class ItemService {
       return false;
     }
   }
+
+  // Find items with pagination and search
+  static async findWithPagination(
+    page: number, 
+    limit: number, 
+    modelName?: string, 
+    brandId?: string | string[]
+  ): Promise<{
+    items: IItem[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    try {
+      const offset = (page - 1) * limit;
+      
+      // Build where clause conditionally
+      const whereClause: any = {};
+      
+      if (modelName) {
+        whereClause.model_name = {
+          [Op.like]: `%${modelName}%`,
+        };
+      }
+      
+      if (brandId) {
+        // Handle both single brand_id and array of brand_ids
+        const brandIds = Array.isArray(brandId) ? brandId : [brandId];
+        whereClause.brand_id = {
+          [Op.in]: brandIds,
+        };
+      }
+
+      // Get total count with same filters
+      const total = await Item.count({
+        where: whereClause,
+      });
+
+      // Get items with pagination and optional filters
+      const items = await Item.findAll({
+        include: [
+          {
+            model: Brand,
+            as: 'brand',
+            attributes: ['name'],
+          },
+        ],
+        where: whereClause,
+        order: [['brand', 'name', 'ASC'], ['model_name', 'ASC']],
+        limit,
+        offset,
+      });
+
+      return {
+        items: items.map(item => item.toJSON()),
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch items with pagination: ${error}`);
+    }
+  }
+
+  // Check if brand exists
+  static async checkBrandExists(brandId: string): Promise<boolean> {
+    try {
+      const brand = await Brand.findByPk(brandId);
+      return !!brand;
+    } catch (error) {
+      throw new Error(`Failed to check brand existence: ${error}`);
+    }
+  }
 }

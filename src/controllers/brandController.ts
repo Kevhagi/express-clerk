@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Brand } from '../models';
+import { BrandService } from '../services';
 import { CreateBrandDTO, UpdateBrandDTO } from '../types';
 
 // GET /api/brands - Get all brands
@@ -9,20 +9,13 @@ export const getAllBrands = async (req: Request, res: Response): Promise<void> =
     const limit = parseInt(req.query.limit as string) || 100;
     const offset = (page - 1) * limit;
 
-    // Get total count
-    const total = await Brand.count();
-
-    const brands = await Brand.findAll({
-      limit,
-      offset,
-      order: [['name', 'ASC']],
-    });
+    const result = await BrandService.findWithPagination(page, limit);
 
     res.json({
-      data: brands,
-      total,
-      page,
-      limit,
+      data: result.brands,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch brands', details: error });
@@ -33,7 +26,7 @@ export const getAllBrands = async (req: Request, res: Response): Promise<void> =
 export const getBrandById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const brand = await Brand.findByPk(id);
+    const brand = await BrandService.findById(id);
     
     if (!brand) {
       res.status(404).json({ error: 'Brand not found' });
@@ -58,9 +51,7 @@ export const createBrand = async (req: Request, res: Response): Promise<void> =>
   try {
     const brandData: CreateBrandDTO = req.body;
 
-    // TODO: Validate brandData before creating
-    const brand = await Brand.create(brandData);
-    const createdBrand = await Brand.findByPk(brand.dataValues.id);
+    const createdBrand = await BrandService.create(brandData);
 
     res.status(201).json({
       data: createdBrand
@@ -81,16 +72,12 @@ export const updateBrand = async (req: Request, res: Response): Promise<void> =>
     const { id } = req.params;
     const updateData: UpdateBrandDTO = req.body;
     
-    const [updatedRowsCount] = await Brand.update(updateData, {
-      where: { id },
-    });
-    
-    if (updatedRowsCount === 0) {
+    const updatedBrand = await BrandService.update(id, updateData);
+    if (!updatedBrand) {
       res.status(404).json({ error: 'Brand not found' });
       return;
     }
     
-    const updatedBrand = await Brand.findByPk(id);
     res.json({
       data: updatedBrand
     });
@@ -103,16 +90,22 @@ export const updateBrand = async (req: Request, res: Response): Promise<void> =>
 export const deleteBrand = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedRowsCount = await Brand.destroy({
-      where: { id },
-    });
     
-    if (deletedRowsCount === 0) {
+    // Check if brand exists before attempting to delete
+    const existingBrand = await BrandService.findById(id);
+    if (!existingBrand) {
       res.status(404).json({ error: 'Brand not found' });
       return;
     }
     
-    res.status(200).send();
+    // Delete brand using service
+    const deleted = await BrandService.delete(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Brand not found' });
+      return;
+    }
+    
+    res.status(200).json({ message: 'Brand deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete brand', details: error });
   }

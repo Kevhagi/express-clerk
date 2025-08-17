@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { DashboardData } from '../types/dashboard';
+import { DashboardData } from '../types';
 
 // GET /api/dashboard - Get dashboard data
 export const getDashboardData = async (req: Request, res: Response): Promise<void> => {

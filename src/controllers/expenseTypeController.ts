@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
-import { ExpenseType } from '../models';
+import { ExpenseTypeService } from '../services';
 import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO } from '../types';
 
 // GET /api/expense-types - Get all expense types
 export const getAllExpenseTypes = async (req: Request, res: Response): Promise<void> => {
   try {
-    const expenseTypes = await ExpenseType.findAll();
-    res.json(expenseTypes);
+    const expenseTypes = await ExpenseTypeService.findAll();
+    res.json({
+      data: expenseTypes
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch expense types', details: error });
   }
@@ -16,14 +18,16 @@ export const getAllExpenseTypes = async (req: Request, res: Response): Promise<v
 export const getExpenseTypeById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const expenseType = await ExpenseType.findByPk(id);
+    const expenseType = await ExpenseTypeService.findById(id);
     
     if (!expenseType) {
       res.status(404).json({ error: 'Expense type not found' });
       return;
     }
     
-    res.json(expenseType);
+    res.json({
+      data: expenseType
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch expense type', details: error });
   }
@@ -38,8 +42,10 @@ export const getExpenseTypeById = async (req: Request, res: Response): Promise<v
 export const createExpenseType = async (req: Request, res: Response): Promise<void> => {
   try {
     const expenseTypeData: CreateExpenseTypeDTO = req.body;
-    const expenseType = await ExpenseType.create(expenseTypeData);
-    res.status(201).json(expenseType);
+    const expenseType = await ExpenseTypeService.create(expenseTypeData);
+    res.status(201).json({
+      data: expenseType
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create expense type', details: error });
   }
@@ -56,17 +62,15 @@ export const updateExpenseType = async (req: Request, res: Response): Promise<vo
     const { id } = req.params;
     const updateData: UpdateExpenseTypeDTO = req.body;
     
-    const [updatedRowsCount] = await ExpenseType.update(updateData, {
-      where: { id },
-    });
-    
-    if (updatedRowsCount === 0) {
+    const updatedExpenseType = await ExpenseTypeService.update(id, updateData);
+    if (!updatedExpenseType) {
       res.status(404).json({ error: 'Expense type not found' });
       return;
     }
     
-    const updatedExpenseType = await ExpenseType.findByPk(id);
-    res.json(updatedExpenseType);
+    res.json({
+      data: updatedExpenseType
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update expense type', details: error });
   }
@@ -76,16 +80,22 @@ export const updateExpenseType = async (req: Request, res: Response): Promise<vo
 export const deleteExpenseType = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedRowsCount = await ExpenseType.destroy({
-      where: { id },
-    });
     
-    if (deletedRowsCount === 0) {
+    // Check if expense type exists before attempting to delete
+    const existingExpenseType = await ExpenseTypeService.findById(id);
+    if (!existingExpenseType) {
       res.status(404).json({ error: 'Expense type not found' });
       return;
     }
     
-    res.status(204).send();
+    // Delete expense type using service
+    const deleted = await ExpenseTypeService.delete(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Expense type not found' });
+      return;
+    }
+    
+    res.status(200).json({ message: 'Expense type deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete expense type', details: error });
   }

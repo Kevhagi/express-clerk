@@ -83,4 +83,44 @@ export class BrandService {
       throw new Error(`Failed to find brand by name: ${error}`);
     }
   }
+
+  // Get total count of brands
+  static async count(): Promise<number> {
+    try {
+      return await Brand.count();
+    } catch (error) {
+      throw new Error(`Failed to count brands: ${error}`);
+    }
+  }
+
+  // Find brands with pagination
+  static async findWithPagination(page: number, limit: number): Promise<{
+    brands: IBrand[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    try {
+      const offset = (page - 1) * limit;
+      
+      // Get total count
+      const total = await Brand.count();
+
+      // Get brands with pagination
+      const brands = await Brand.findAll({
+        limit,
+        offset,
+        order: [['name', 'ASC']],
+      });
+
+      return {
+        brands: brands.map(brand => brand.toJSON()),
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch brands with pagination: ${error}`);
+    }
+  }
 }

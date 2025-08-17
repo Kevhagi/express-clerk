@@ -1,5 +1,6 @@
 import { Contact } from '../models';
 import { CreateContactDTO, UpdateContactDTO, IContact } from '../types';
+import { Op } from 'sequelize';
 
 export class ContactService {
   // Create a new contact
@@ -78,13 +79,118 @@ export class ContactService {
       const contacts = await Contact.findAll({
         where: {
           name: {
-            [require('sequelize').Op.iLike]: `%${name}%`
+            [Op.like]: `%${name}%`
           }
         }
       });
       return contacts.map(contact => contact.toJSON());
     } catch (error) {
       throw new Error(`Failed to search contacts by name: ${error}`);
+    }
+  }
+
+  // Find contacts with pagination and search
+  static async findWithPagination(page: number, limit: number, name?: string, phone?: string): Promise<{
+    contacts: IContact[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    try {
+      const offset = (page - 1) * limit;
+      
+      // Build where clause conditionally
+      const whereClause: any = {};
+      
+      if (name) {
+        whereClause.name = {
+          [Op.like]: `%${name}%`,
+        };
+      }
+      
+      if (phone) {
+        whereClause.phone = {
+          [Op.like]: `%${phone}%`,
+        };
+      }
+
+      // Get total count with same filters
+      const total = await Contact.count({
+        where: whereClause,
+      });
+
+      // Get contacts with pagination and optional filters
+      const contacts = await Contact.findAll({
+        where: whereClause,
+        order: [['name', 'ASC']],
+        limit,
+        offset,
+      });
+
+      return {
+        contacts: contacts.map(contact => contact.toJSON()),
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch contacts with pagination: ${error}`);
+    }
+  }
+
+  // Check for duplicate contact (name, phone, or combination)
+  static async checkForDuplicates(contactData: CreateContactDTO | UpdateContactDTO, excludeId?: string): Promise<{
+    hasNameDuplicate: boolean;
+    hasPhoneDuplicate: boolean;
+    hasCombinationDuplicate: boolean;
+    existingContacts: {
+      name?: IContact;
+      phone?: IContact;
+      combination?: IContact;
+    };
+  }> {
+    try {
+      const whereClause: any = {};
+      if (excludeId) {
+        whereClause.id = { [Op.ne]: excludeId };
+      }
+
+      // Check for name duplicate (only if name is provided)
+      let nameDuplicate = null;
+      if (contactData.name) {
+        nameDuplicate = await Contact.findOne({
+          where: { ...whereClause, name: contactData.name },
+        });
+      }
+
+      // Check for phone duplicate (only if phone is provided)
+      let phoneDuplicate = null;
+      if (contactData.phone) {
+        phoneDuplicate = await Contact.findOne({
+          where: { ...whereClause, phone: contactData.phone },
+        });
+      }
+
+      // Check for combination duplicate (only if both name and phone are provided)
+      let combinationDuplicate = null;
+      if (contactData.name && contactData.phone) {
+        combinationDuplicate = await Contact.findOne({
+          where: { ...whereClause, name: contactData.name, phone: contactData.phone },
+        });
+      }
+
+      return {
+        hasNameDuplicate: !!nameDuplicate,
+        hasPhoneDuplicate: !!phoneDuplicate,
+        hasCombinationDuplicate: !!combinationDuplicate,
+        existingContacts: {
+          name: nameDuplicate ? nameDuplicate.toJSON() : undefined,
+          phone: phoneDuplicate ? phoneDuplicate.toJSON() : undefined,
+          combination: combinationDuplicate ? combinationDuplicate.toJSON() : undefined,
+        },
+      };
+    } catch (error) {
+      throw new Error(`Failed to check for duplicates: ${error}`);
     }
   }
 }
