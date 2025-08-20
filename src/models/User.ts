@@ -15,8 +15,7 @@ class User extends Model<IUser> implements IUser {
 User.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     firstName: {
@@ -30,10 +29,12 @@ User.init(
     createdBy: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'system',
     },
     updatedBy: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'system',
     },
   },
   {

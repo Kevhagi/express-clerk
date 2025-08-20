@@ -4,9 +4,13 @@ import { Op } from 'sequelize';
 
 export class ContactService {
   // Create a new contact
-  static async create(contactData: CreateContactDTO): Promise<IContact> {
+  static async create(contactData: CreateContactDTO, clerkId: string): Promise<IContact> {
     try {
-      const contact = await Contact.create(contactData);
+      const contact = await Contact.create({
+        ...contactData,
+        created_by: clerkId,
+        updated_by: clerkId
+      });
       return contact.toJSON();
     } catch (error) {
       throw new Error(`Failed to create contact: ${error}`);
@@ -34,14 +38,17 @@ export class ContactService {
   }
 
   // Update contact by ID
-  static async update(id: string, contactData: UpdateContactDTO): Promise<IContact | null> {
+  static async update(id: string, contactData: UpdateContactDTO, clerkId: string): Promise<IContact | null> {
     try {
       const contact = await Contact.findByPk(id);
       if (!contact) {
         return null;
       }
       
-      await contact.update(contactData);
+      await contact.update({
+        ...contactData,
+        updated_by: clerkId
+      });
       return contact.toJSON();
     } catch (error) {
       throw new Error(`Failed to update contact with ID ${id}: ${error}`);

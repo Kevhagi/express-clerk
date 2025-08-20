@@ -51,7 +51,7 @@ export const createBrand = async (req: Request, res: Response): Promise<void> =>
   try {
     const brandData: CreateBrandDTO = req.body;
 
-    const createdBrand = await BrandService.create(brandData);
+    const createdBrand = await BrandService.create(brandData, req.clerkId!);
 
     res.status(201).json({
       data: createdBrand
@@ -72,7 +72,7 @@ export const updateBrand = async (req: Request, res: Response): Promise<void> =>
     const { id } = req.params;
     const updateData: UpdateBrandDTO = req.body;
     
-    const updatedBrand = await BrandService.update(id, updateData);
+    const updatedBrand = await BrandService.update(id, updateData, req.clerkId!);
     if (!updatedBrand) {
       res.status(404).json({ error: 'Brand not found' });
       return;

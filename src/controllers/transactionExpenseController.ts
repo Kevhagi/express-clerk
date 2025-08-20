@@ -83,7 +83,11 @@ export const createTransactionExpense = async (req: Request, res: Response): Pro
       return;
     }
     
-    const transactionExpense = await TransactionExpense.create(transactionExpenseData);
+    const transactionExpense = await TransactionExpense.create({
+      ...transactionExpenseData,
+      created_by: req.clerkId!,
+      updated_by: req.clerkId!
+    });
     const createdTransactionExpense = await TransactionExpense.findByPk(transactionExpense.id, {
       include: [
         {
@@ -138,7 +142,10 @@ export const updateTransactionExpense = async (req: Request, res: Response): Pro
       }
     }
     
-    const [updatedRowsCount] = await TransactionExpense.update(updateData, {
+    const [updatedRowsCount] = await TransactionExpense.update({
+      ...updateData,
+      updated_by: req.clerkId!
+    }, {
       where: { id },
     });
     

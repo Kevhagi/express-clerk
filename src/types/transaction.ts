@@ -1,4 +1,4 @@
-export type TransactionType = 'Penjualan' | 'Pembelian';
+export type TransactionType = 'buy' | 'sell';
 
 export interface ITransaction {
     id?: string;
@@ -49,7 +49,6 @@ export interface CreateTransactionDTO {
     total: number;
     transaction_date: Date;
     notes?: string;
-    created_by: string;
   }
   
 export interface UpdateTransactionDTO {
@@ -60,7 +59,6 @@ export interface UpdateTransactionDTO {
     total?: number;
     transaction_date?: Date;
     notes?: string;
-    updated_by: string;
 }
   
 export interface CreateTransactionItemDTO {
@@ -69,7 +67,6 @@ export interface CreateTransactionItemDTO {
     unit_price: number;
     qty: number;
     subtotal: number;
-    created_by: string;
 }
   
 export interface UpdateTransactionItemDTO {
@@ -78,7 +75,6 @@ export interface UpdateTransactionItemDTO {
     unit_price?: number;
     qty?: number;
     subtotal?: number;
-    updated_by: string;
 }
   
 export interface CreateTransactionExpenseDTO {
@@ -87,7 +83,6 @@ export interface CreateTransactionExpenseDTO {
     amount: number;
     notes?: string;
     subtotal: number;
-    created_by: string;
 }
   
 export interface UpdateTransactionExpenseDTO {
@@ -96,5 +91,4 @@ export interface UpdateTransactionExpenseDTO {
     amount?: number;
     notes?: string;
     subtotal?: number;
-    updated_by: string;
 }

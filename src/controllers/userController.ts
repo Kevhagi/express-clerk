@@ -45,7 +45,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData: CreateUserDTO = req.body;
-    const user = await UserService.create(userData);
+    const user = await UserService.create(userData, req.clerkId!);
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ error: 'Failed to create user', details: error });
@@ -69,7 +69,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
-    const updatedUser = await UserService.update(id, updateData);
+    const updatedUser = await UserService.update(id, updateData, req.clerkId!);
     
     if (!updatedUser) {
       res.status(404).json({ error: 'User not found' });

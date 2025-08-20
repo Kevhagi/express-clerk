@@ -11,11 +11,9 @@ export interface IUser {
 export interface CreateUserDTO {
     firstName: string;
     lastName: string;
-    createdBy: string;
 }
 
 export interface UpdateUserDTO {
     firstName?: string;
     lastName?: string;
-    updatedBy: string;
 }

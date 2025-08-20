@@ -3,9 +3,13 @@ import { CreateBrandDTO, UpdateBrandDTO, IBrand } from '../types';
 
 export class BrandService {
   // Create a new brand
-  static async create(brandData: CreateBrandDTO): Promise<IBrand> {
+  static async create(brandData: CreateBrandDTO, clerkId: string): Promise<IBrand> {
     try {
-      const brand = await Brand.create(brandData);
+      const brand = await Brand.create({
+        ...brandData,
+        created_by: clerkId,
+        updated_by: clerkId
+      });
       return brand.toJSON();
     } catch (error) {
       throw new Error(`Failed to create brand: ${error}`);
@@ -33,14 +37,17 @@ export class BrandService {
   }
 
   // Update brand by ID
-  static async update(id: string, brandData: UpdateBrandDTO): Promise<IBrand | null> {
+  static async update(id: string, brandData: UpdateBrandDTO, clerkId: string): Promise<IBrand | null> {
     try {
       const brand = await Brand.findByPk(id);
       if (!brand) {
         return null;
       }
       
-      await brand.update(brandData);
+      await brand.update({
+        ...brandData,
+        updated_by: clerkId
+      });
       return brand.toJSON();
     } catch (error) {
       throw new Error(`Failed to update brand with ID ${id}: ${error}`);

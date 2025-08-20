@@ -42,7 +42,7 @@ export const getExpenseTypeById = async (req: Request, res: Response): Promise<v
 export const createExpenseType = async (req: Request, res: Response): Promise<void> => {
   try {
     const expenseTypeData: CreateExpenseTypeDTO = req.body;
-    const expenseType = await ExpenseTypeService.create(expenseTypeData);
+    const expenseType = await ExpenseTypeService.create(expenseTypeData, req.clerkId!);
     res.status(201).json({
       data: expenseType
     });
@@ -62,7 +62,7 @@ export const updateExpenseType = async (req: Request, res: Response): Promise<vo
     const { id } = req.params;
     const updateData: UpdateExpenseTypeDTO = req.body;
     
-    const updatedExpenseType = await ExpenseTypeService.update(id, updateData);
+    const updatedExpenseType = await ExpenseTypeService.update(id, updateData, req.clerkId!);
     if (!updatedExpenseType) {
       res.status(404).json({ error: 'Expense type not found' });
       return;

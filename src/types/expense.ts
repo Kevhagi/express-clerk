@@ -9,10 +9,8 @@ export interface IExpenseType {
 
 export interface CreateExpenseTypeDTO {
     name: string;
-    created_by: string;
 }
   
 export interface UpdateExpenseTypeDTO {
     name?: string;
-    updated_by: string;
 }

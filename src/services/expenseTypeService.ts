@@ -3,9 +3,13 @@ import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO, IExpenseType } from '../typ
 
 export class ExpenseTypeService {
   // Create a new expense type
-  static async create(expenseTypeData: CreateExpenseTypeDTO): Promise<IExpenseType> {
+  static async create(expenseTypeData: CreateExpenseTypeDTO, clerkId: string): Promise<IExpenseType> {
     try {
-      const expenseType = await ExpenseType.create(expenseTypeData);
+      const expenseType = await ExpenseType.create({
+        ...expenseTypeData,
+        created_by: clerkId,
+        updated_by: clerkId
+      });
       return expenseType.toJSON();
     } catch (error) {
       throw new Error(`Failed to create expense type: ${error}`);
@@ -33,14 +37,17 @@ export class ExpenseTypeService {
   }
 
   // Update expense type by ID
-  static async update(id: string, expenseTypeData: UpdateExpenseTypeDTO): Promise<IExpenseType | null> {
+  static async update(id: string, expenseTypeData: UpdateExpenseTypeDTO, clerkId: string): Promise<IExpenseType | null> {
     try {
       const expenseType = await ExpenseType.findByPk(id);
       if (!expenseType) {
         return null;
       }
       
-      await expenseType.update(expenseTypeData);
+      await expenseType.update({
+        ...expenseTypeData,
+        updated_by: clerkId
+      });
       return expenseType.toJSON();
     } catch (error) {
       throw new Error(`Failed to update expense type with ID ${id}: ${error}`);

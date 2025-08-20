@@ -59,7 +59,7 @@ export const createItem = async (req: Request, res: Response): Promise<void> => 
     }
     
     // Create item using service
-    const createdItem = await ItemService.create(itemData);
+    const createdItem = await ItemService.create(itemData, req.clerkId!);
     
     // Get the created item with brand information
     const itemWithBrand = await ItemService.findById(createdItem.id!);
@@ -88,7 +88,7 @@ export const updateItem = async (req: Request, res: Response): Promise<void> => 
     }
     
     // Update item using service
-    const updatedItem = await ItemService.update(id, updateData);
+    const updatedItem = await ItemService.update(id, updateData, req.clerkId!);
     if (!updatedItem) {
       res.status(404).json({ error: 'Item not found' });
       return;

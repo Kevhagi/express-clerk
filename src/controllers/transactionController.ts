@@ -127,7 +127,7 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
   "user_id": 1,
   "supplier_id": 2,
   "customer_id": null,
-  "type": "Pembelian",
+  "type": "buy",
   "total": 15000000.00,
   "transaction_date": "2024-01-15T10:30:00.000Z",
   "notes": "Purchase of smartphones for inventory"
@@ -136,6 +136,13 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {
   try {
     const transactionData: CreateTransactionDTO = req.body;
+    
+    // Add audit fields from clerk ID
+    const transactionWithAudit = {
+      ...transactionData,
+      created_by: req.clerkId!,
+      updated_by: req.clerkId!
+    };
     
     // Verify user exists
     const user = await User.findByPk(transactionData.user_id);
@@ -162,7 +169,7 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
       }
     }
     
-    const transaction = await Transaction.create(transactionData);
+    const transaction = await Transaction.create(transactionWithAudit);
     const createdTransaction = await Transaction.findByPk(transaction.id, {
       include: [
         {
@@ -195,7 +202,7 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
   "user_id": 1,
   "supplier_id": 3,
   "customer_id": 1,
-  "type": "Penjualan",
+  "type": "sell",
   "total": 18000000.00,
   "transaction_date": "2024-01-16T14:30:00.000Z",
   "notes": "Sale of smartphones"
@@ -205,6 +212,12 @@ export const updateTransaction = async (req: Request, res: Response): Promise<vo
   try {
     const { id } = req.params;
     const updateData: UpdateTransactionDTO = req.body;
+    
+    // Add audit field from clerk ID
+    const updateDataWithAudit = {
+      ...updateData,
+      updated_by: req.clerkId!
+    };
     
     // Verify user exists if being updated
     if (updateData.user_id) {
@@ -233,7 +246,7 @@ export const updateTransaction = async (req: Request, res: Response): Promise<vo
       }
     }
     
-    const [updatedRowsCount] = await Transaction.update(updateData, {
+    const [updatedRowsCount] = await Transaction.update(updateDataWithAudit, {
       where: { id },
     });
     

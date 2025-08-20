@@ -16,7 +16,6 @@ export interface CreateItemDTO {
     model_name: string;
     ram_gb: number;
     storage_gb: number;
-    created_by: string;
 }
   
   export interface UpdateItemDTO {
@@ -24,5 +23,4 @@ export interface CreateItemDTO {
     model_name?: string;
     ram_gb?: number;
     storage_gb?: number;
-    updated_by: string;
 }

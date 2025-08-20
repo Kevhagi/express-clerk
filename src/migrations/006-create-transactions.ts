@@ -38,7 +38,7 @@ export const up = async (queryInterface: QueryInterface) => {
       onDelete: 'SET NULL',
     },
     type: {
-      type: DataTypes.ENUM('Penjualan', 'Pembelian'),
+      type: DataTypes.ENUM('buy', 'sell'),
       allowNull: false,
     },
     total: {

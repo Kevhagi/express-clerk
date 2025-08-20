@@ -3,9 +3,13 @@ import { CreateUserDTO, UpdateUserDTO, IUser } from '../types';
 
 export class UserService {
   // Create a new user
-  static async create(userData: CreateUserDTO): Promise<IUser> {
+  static async create(userData: CreateUserDTO, clerkId: string): Promise<IUser> {
     try {
-      const user = await User.create(userData);
+      const user = await User.create({
+        ...userData,
+        createdBy: clerkId,
+        updatedBy: clerkId
+      });
       return user.toJSON();
     } catch (error) {
       throw new Error(`Failed to create user: ${error}`);
@@ -33,14 +37,17 @@ export class UserService {
   }
 
   // Update user by ID
-  static async update(id: string, userData: UpdateUserDTO): Promise<IUser | null> {
+  static async update(id: string, userData: UpdateUserDTO, clerkId: string): Promise<IUser | null> {
     try {
       const user = await User.findByPk(id);
       if (!user) {
         return null;
       }
       
-      await user.update(userData);
+      await user.update({
+        ...userData,
+        updatedBy: clerkId
+      });
       return user.toJSON();
     } catch (error) {
       throw new Error(`Failed to update user with ID ${id}: ${error}`);

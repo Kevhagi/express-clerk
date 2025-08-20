@@ -25,10 +25,12 @@ ExpenseType.init(
     created_by: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'system',
     },
     updated_by: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'system',
     },
     created_at: {
       type: DataTypes.DATE,

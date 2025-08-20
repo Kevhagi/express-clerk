@@ -6,6 +6,7 @@ import { initDatabase } from './models'
 import apiRoutes from './routes'
 import { seedBrands } from './seeders/seedBrands'
 import { seedItems } from './seeders/seedItems'
+import { clerkIdInjectorWithLogging } from './middleware'
 
 const app = express()
 const PORT = process.env.PORT || 3002
@@ -14,6 +15,9 @@ const PORT = process.env.PORT || 3002
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(clerkMiddleware())
+
+// Inject clerk ID into request and log all requests
+app.use(clerkIdInjectorWithLogging)
 
 app.use(cors())
 

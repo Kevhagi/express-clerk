@@ -95,7 +95,11 @@ export const createTransactionItem = async (req: Request, res: Response): Promis
       return;
     }
     
-    const transactionItem = await TransactionItem.create(transactionItemData);
+    const transactionItem = await TransactionItem.create({
+      ...transactionItemData,
+      created_by: req.clerkId!,
+      updated_by: req.clerkId!
+    });
     const createdTransactionItem = await TransactionItem.findByPk(transactionItem.id, {
       include: [
         {
@@ -156,7 +160,10 @@ export const updateTransactionItem = async (req: Request, res: Response): Promis
       }
     }
     
-    const [updatedRowsCount] = await TransactionItem.update(updateData, {
+    const [updatedRowsCount] = await TransactionItem.update({
+      ...updateData,
+      updated_by: req.clerkId!
+    }, {
       where: { id },
     });
     

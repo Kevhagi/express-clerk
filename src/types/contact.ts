@@ -11,11 +11,9 @@ export interface IContact {
 export interface CreateContactDTO {
     name: string;
     phone: string;
-    created_by: string;
 }
   
   export interface UpdateContactDTO {
     name?: string;
     phone?: string;
-    updated_by: string;
 }

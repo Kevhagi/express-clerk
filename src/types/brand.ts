@@ -9,10 +9,8 @@ export interface IBrand {
 
 export interface CreateBrandDTO {
     name: string;
-    created_by: string;
 }
   
 export interface UpdateBrandDTO {
     name?: string;
-    updated_by: string;
 }

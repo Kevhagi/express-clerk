@@ -4,9 +4,13 @@ import { Op } from 'sequelize';
 
 export class ItemService {
   // Create a new item
-  static async create(itemData: CreateItemDTO): Promise<IItem> {
+  static async create(itemData: CreateItemDTO, clerkId: string): Promise<IItem> {
     try {
-      const item = await Item.create(itemData);
+      const item = await Item.create({
+        ...itemData,
+        created_by: clerkId,
+        updated_by: clerkId
+      });
       return item.toJSON();
     } catch (error) {
       throw new Error(`Failed to create item: ${error}`);
@@ -50,14 +54,17 @@ export class ItemService {
   }
 
   // Update item by ID
-  static async update(id: string, itemData: UpdateItemDTO): Promise<IItem | null> {
+  static async update(id: string, itemData: UpdateItemDTO, clerkId: string): Promise<IItem | null> {
     try {
       const item = await Item.findByPk(id);
       if (!item) {
         return null;
       }
       
-      await item.update(itemData);
+      await item.update({
+        ...itemData,
+        updated_by: clerkId
+      });
       const updatedItem = await Item.findByPk(id, {
         include: [
           {

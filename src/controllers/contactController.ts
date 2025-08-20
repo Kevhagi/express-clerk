@@ -87,7 +87,7 @@ export const createContact = async (req: Request, res: Response): Promise<void> 
       return;
     }
     
-    const contact = await ContactService.create(contactData);
+    const contact = await ContactService.create(contactData, req.clerkId!);
     res.status(201).json({
       data: contact
     });
@@ -147,7 +147,7 @@ export const updateContact = async (req: Request, res: Response): Promise<void> 
       return;
     }
     
-    const updatedContact = await ContactService.update(id, updateData);
+    const updatedContact = await ContactService.update(id, updateData, req.clerkId!);
     if (!updatedContact) {
       res.status(404).json({ error: 'Contact not found' });
       return;
