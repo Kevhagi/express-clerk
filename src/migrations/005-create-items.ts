@@ -18,13 +18,13 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    ram_gb: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
     storage_gb: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    ram_gb: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     display_name: {
       type: DataTypes.STRING,
@@ -38,6 +38,13 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     }
+  });
+
+  // Add unique constraint on composite fields
+  await queryInterface.addConstraint('items', {
+    fields: ['brand_id', 'model_name', 'storage_gb'],
+    type: 'unique',
+    name: 'items_composite_unique'
   });
 
   // Function to auto-update display_name

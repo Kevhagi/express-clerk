@@ -1,54 +1,46 @@
-import { QueryInterface, DataTypes } from 'sequelize';
+import { DataTypes, QueryInterface } from 'sequelize';
 
 export const up = async (queryInterface: QueryInterface) => {
   await queryInterface.createTable('transaction_items', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     transaction_id: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: 'transactions',
-        key: 'id',
-      },
+      references: { model: 'transactions', key: 'id' },
       onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     item_id: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: 'items',
-        key: 'id',
-      },
+      references: { model: 'items', key: 'id' },
       onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
+      onDelete: 'RESTRICT'
     },
     unit_price: {
       type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      allowNull: false
     },
     qty: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: false
     },
     subtotal: {
       type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      allowNull: false
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+      defaultValue: DataTypes.NOW
+    }
   });
 };
 

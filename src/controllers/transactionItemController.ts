@@ -70,8 +70,8 @@ export const getTransactionItemById = async (req: Request, res: Response): Promi
 // POST /api/transaction-items - Create new transaction item
 /* Sample request body:
 {
-  "transaction_id": 1,
-  "item_id": 2,
+  "transaction_id": "transaction-uuid",
+  "item_id": "item-uuid",
   "unit_price": 12000000.00,
   "qty": 2,
   "subtotal": 24000000.00
@@ -130,8 +130,8 @@ export const createTransactionItem = async (req: Request, res: Response): Promis
 // PUT /api/transaction-items/:id - Update transaction item
 /* Sample request body:
 {
-  "transaction_id": 1,
-  "item_id": 2,
+  "transaction_id": "transaction-uuid",
+  "item_id": "item-uuid",
   "unit_price": 13000000.00,
   "qty": 3,
   "subtotal": 39000000.00

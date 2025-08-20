@@ -34,11 +34,11 @@ Item.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    ram_gb: {
+    storage_gb: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    storage_gb: {
+    ram_gb: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -72,6 +72,13 @@ Item.init(
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    indexes: [
+      {
+        unique: true,
+        fields: ['brand_id', 'model_name', 'storage_gb'],
+        name: 'items_composite_unique'
+      }
+    ]
   }
 );
 

@@ -18,7 +18,7 @@ export interface CreateItemDTO {
     storage_gb: number;
 }
   
-  export interface UpdateItemDTO {
+export interface UpdateItemDTO {
     brand_id?: string;
     model_name?: string;
     ram_gb?: number;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Transaction, User, Contact, TransactionItem, TransactionExpense, Item, Brand, ExpenseType } from '../models';
+import { Transaction, Contact, TransactionItem, TransactionExpense, Item, Brand, ExpenseType } from '../models';
 import { CreateTransactionDTO, UpdateTransactionDTO } from '../types';
 
 // GET /api/transactions - Get all transactions with related data
@@ -7,11 +7,6 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
   try {
     const transactions = await Transaction.findAll({
       include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName'],
-        },
         {
           model: Contact,
           as: 'supplier',
@@ -64,11 +59,6 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
     const { id } = req.params;
     const transaction = await Transaction.findByPk(id, {
       include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName'],
-        },
         {
           model: Contact,
           as: 'supplier',
@@ -124,7 +114,6 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
 // POST /api/transactions - Create new transaction
 /* Sample request body:
 {
-  "user_id": 1,
   "supplier_id": 2,
   "customer_id": null,
   "type": "buy",
@@ -143,13 +132,6 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
       created_by: req.clerkId!,
       updated_by: req.clerkId!
     };
-    
-    // Verify user exists
-    const user = await User.findByPk(transactionData.user_id);
-    if (!user) {
-      res.status(400).json({ error: 'User not found' });
-      return;
-    }
     
     // Verify supplier exists if provided
     if (transactionData.supplier_id) {
@@ -173,11 +155,6 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
     const createdTransaction = await Transaction.findByPk(transaction.id, {
       include: [
         {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName'],
-        },
-        {
           model: Contact,
           as: 'supplier',
           attributes: ['id', 'name', 'phone'],
@@ -199,7 +176,6 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
 // PUT /api/transactions/:id - Update transaction
 /* Sample request body:
 {
-  "user_id": 1,
   "supplier_id": 3,
   "customer_id": 1,
   "type": "sell",
@@ -218,15 +194,6 @@ export const updateTransaction = async (req: Request, res: Response): Promise<vo
       ...updateData,
       updated_by: req.clerkId!
     };
-    
-    // Verify user exists if being updated
-    if (updateData.user_id) {
-      const user = await User.findByPk(updateData.user_id);
-      if (!user) {
-        res.status(400).json({ error: 'User not found' });
-        return;
-      }
-    }
     
     // Verify supplier exists if being updated
     if (updateData.supplier_id) {
@@ -257,11 +224,6 @@ export const updateTransaction = async (req: Request, res: Response): Promise<vo
     
     const updatedTransaction = await Transaction.findByPk(id, {
       include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'firstName', 'lastName'],
-        },
         {
           model: Contact,
           as: 'supplier',

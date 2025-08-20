@@ -124,7 +124,7 @@ export class ItemService {
     }
   }
 
-  // Find items by model name (partial match)
+  // Find items by model name (partial match, case insensitive)
   static async findByModelName(modelName: string): Promise<IItem[]> {
     try {
       const items = await Item.findAll({
@@ -184,7 +184,7 @@ export class ItemService {
       
       if (modelName) {
         whereClause.model_name = {
-          [Op.like]: `%${modelName}%`,
+          [Op.iLike]: `%${modelName}%`,
         };
       }
       
