@@ -161,7 +161,6 @@ POST /api/items
 ```json
 POST /api/transactions
 {
-  "user_id": 1,
   "supplier_id": 2,
   "customer_id": null,
   "type": "Pembelian",

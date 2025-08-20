@@ -7,16 +7,6 @@ export const up = async (queryInterface: QueryInterface) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    user_id: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
-    },
     supplier_id: {
       type: DataTypes.UUID,
       allowNull: true,

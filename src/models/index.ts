@@ -10,7 +10,7 @@ import TransactionExpense from './TransactionExpense';
 
 // Define associations
 // User associations
-User.hasMany(Transaction, { foreignKey: 'user_id', as: 'transactions' });
+// Removed user_id from Transaction; no direct association
 
 // Contact associations
 Contact.hasMany(Transaction, { foreignKey: 'supplier_id', as: 'supplierTransactions' });
@@ -27,7 +27,7 @@ Item.hasMany(TransactionItem, { foreignKey: 'item_id', as: 'transactionItems' })
 ExpenseType.hasMany(TransactionExpense, { foreignKey: 'expense_type_id', as: 'transactionExpenses' });
 
 // Transaction associations
-Transaction.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+// Removed user association from Transaction
 Transaction.belongsTo(Contact, { foreignKey: 'supplier_id', as: 'supplier' });
 Transaction.belongsTo(Contact, { foreignKey: 'customer_id', as: 'customer' });
 Transaction.hasMany(TransactionItem, { foreignKey: 'transaction_id', as: 'transactionItems' });

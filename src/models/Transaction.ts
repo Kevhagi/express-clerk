@@ -4,7 +4,6 @@ import { ITransaction, TransactionType } from '../types';
 
 class Transaction extends Model<ITransaction> implements ITransaction {
   public id!: string;
-  public user_id!: string;
   public supplier_id?: string;
   public customer_id?: string;
   public type!: TransactionType;
@@ -23,14 +22,6 @@ Transaction.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-    },
-    user_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
     },
     supplier_id: {
       type: DataTypes.UUID,

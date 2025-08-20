@@ -1,4 +1,4 @@
-import { Transaction, User, Contact } from '../models';
+import { Transaction, Contact } from '../models';
 import { CreateTransactionDTO, UpdateTransactionDTO, ITransaction, TransactionType } from '../types';
 
 export class TransactionService {
@@ -17,11 +17,6 @@ export class TransactionService {
     try {
       const transactions = await Transaction.findAll({
         include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
           {
             model: Contact,
             as: 'supplier',
@@ -46,11 +41,6 @@ export class TransactionService {
     try {
       const transaction = await Transaction.findByPk(id, {
         include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
           {
             model: Contact,
             as: 'supplier',
@@ -80,11 +70,6 @@ export class TransactionService {
       await transaction.update(transactionData);
       const updatedTransaction = await Transaction.findByPk(id, {
         include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
           {
             model: Contact,
             as: 'supplier',
@@ -135,11 +120,6 @@ export class TransactionService {
         where: { type },
         include: [
           {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
-          {
             model: Contact,
             as: 'supplier',
             attributes: ['id', 'name', 'phone']
@@ -159,34 +139,7 @@ export class TransactionService {
   }
 
   // Find transactions by user ID
-  static async findByUserId(userId: string): Promise<ITransaction[]> {
-    try {
-      const transactions = await Transaction.findAll({
-        where: { user_id: userId },
-        include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
-          {
-            model: Contact,
-            as: 'supplier',
-            attributes: ['id', 'name', 'phone']
-          },
-          {
-            model: Contact,
-            as: 'customer',
-            attributes: ['id', 'name', 'phone']
-          }
-        ],
-        order: [['transaction_date', 'DESC']]
-      });
-      return transactions.map(transaction => transaction.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to fetch transactions by user ID ${userId}: ${error}`);
-    }
-  }
+  // Removed findByUserId: user_id dropped from Transaction
 
   // Find transactions by date range
   static async findByDateRange(startDate: Date, endDate: Date): Promise<ITransaction[]> {
@@ -198,11 +151,6 @@ export class TransactionService {
           }
         },
         include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['id', 'firstName', 'lastName']
-          },
           {
             model: Contact,
             as: 'supplier',

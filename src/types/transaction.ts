@@ -2,7 +2,6 @@ export type TransactionType = 'buy' | 'sell';
 
 export interface ITransaction {
     id?: string;
-    user_id: string;
     supplier_id?: string;
     customer_id?: string;
     type: TransactionType;
@@ -42,7 +41,6 @@ export interface ITransactionExpense {
 }
 
 export interface CreateTransactionDTO {
-    user_id: string;
     supplier_id?: string;
     customer_id?: string;
     type: TransactionType;
@@ -52,7 +50,6 @@ export interface CreateTransactionDTO {
   }
   
 export interface UpdateTransactionDTO {
-    user_id?: string;
     supplier_id?: string;
     customer_id?: string;
     type?: TransactionType;
