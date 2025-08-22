@@ -8,7 +8,7 @@ The application implements the following entities:
 - **Users**: Application users
 - **Contacts**: Suppliers and customers
 - **Brands**: Product brands
-- **Items**: Products with specifications
+- **Items**: Products with specifications (composite primary key: brand_id + model_name + storage_gb)
 - **Expense Types**: Categories for transaction expenses
 - **Transactions**: Sales (`Penjualan`) and Purchase (`Pembelian`) transactions
 - **Transaction Items**: Items within transactions
@@ -91,10 +91,10 @@ All endpoints are available under `/api`:
 
 ### Items
 - `GET /api/items` - Get all items (with brand info)
-- `GET /api/items/:id` - Get item by ID (with brand info)
+- `GET /api/items/:brand_id/:model_name/:storage_gb` - Get item by composite key (with brand info)
 - `POST /api/items` - Create item
-- `PUT /api/items/:id` - Update item
-- `DELETE /api/items/:id` - Delete item
+- `PUT /api/items/:brand_id/:model_name/:storage_gb` - Update item
+- `DELETE /api/items/:brand_id/:model_name/:storage_gb` - Delete item
 
 ### Transactions
 - `GET /api/transactions` - Get all transactions (with full details)
@@ -149,7 +149,7 @@ POST /api/brands
 ```json
 POST /api/items
 {
-  "brand_id": 1,
+  "brand_id": "brand-uuid",
   "model_name": "iPhone 15 Pro",
   "ram_gb": 8,
   "storage_gb": 256,
@@ -161,9 +161,9 @@ POST /api/items
 ```json
 POST /api/transactions
 {
-  "supplier_id": 2,
+  "supplier_id": "supplier-uuid",
   "customer_id": null,
-  "type": "Pembelian",
+  "type": "buy",
   "total": 15000000.00,
   "transaction_date": "2024-01-15T10:30:00.000Z",
   "notes": "Purchase of smartphones for inventory"
@@ -174,8 +174,10 @@ POST /api/transactions
 ```json
 POST /api/transaction-items
 {
-  "transaction_id": 1,
-  "item_id": 2,
+  "transaction_id": "transaction-uuid",
+  "item_brand_id": "brand-uuid",
+  "item_model_name": "iPhone 15 Pro",
+  "item_storage_gb": 256,
   "unit_price": 12000000.00,
   "qty": 2,
   "subtotal": 24000000.00
@@ -186,8 +188,8 @@ POST /api/transaction-items
 ```json
 POST /api/transaction-expenses
 {
-  "transaction_id": 1,
-  "expense_type_id": 2,
+  "transaction_id": "transaction-uuid",
+  "expense_type_id": "expense-type-uuid",
   "amount": 500000.00,
   "notes": "Shipping cost for bulk order",
   "subtotal": 500000.00
@@ -217,7 +219,9 @@ src/
 │   ├── 005-create-items.ts
 │   ├── 006-create-transactions.ts
 │   ├── 007-create-transaction-items.ts
-│   └── 008-create-transaction-expenses.ts
+│   ├── 008-create-transaction-expenses.ts
+│   ├── 019-modify-items-composite-pk.ts
+│   └── 020-update-transaction-items-composite-fk.ts
 ├── models/
 │   ├── User.ts
 │   ├── Contact.ts
@@ -250,11 +254,13 @@ src/
 - ✅ TypeScript interfaces and DTOs
 - ✅ Sequelize migrations
 - ✅ Error handling
-- ✅ Transaction type ENUM (`Penjualan`, `Pembelian`)
+- ✅ Transaction type ENUM (`buy`, `sell`)
 - ✅ Eager loading for related data
 - ✅ Clean folder structure
 - ✅ Async/await pattern
 - ✅ Input validation
 - ✅ Clerk authentication integration
+- ✅ Composite primary keys for Items (brand_id + model_name + storage_gb)
+- ✅ Case-insensitive model name matching
 
 The application is ready to run and provides a complete API for managing transactions, items, users, and related entities.

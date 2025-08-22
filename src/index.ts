@@ -6,7 +6,10 @@ import { initDatabase } from './models'
 import apiRoutes from './routes'
 import { seedBrands } from './seeders/seedBrands'
 import { seedItems } from './seeders/seedItems'
-import { clerkIdInjectorWithLogging } from './middleware'
+import { 
+  clerkIdInjectorWithLogging, 
+  performanceLogger
+} from './middleware'
 
 const app = express()
 const PORT = process.env.PORT || 3002
@@ -18,6 +21,9 @@ app.use(clerkMiddleware())
 
 // Inject clerk ID into request and log all requests
 app.use(clerkIdInjectorWithLogging)
+
+// Performance logging middleware - logs execution time for all endpoints
+app.use(performanceLogger)
 
 app.use(cors())
 
@@ -58,24 +64,6 @@ app.use(cors())
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' })
-})
-
-// Homepage
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the Clerk Express Quickstart with Sequelize!',
-    endpoints: {
-      dashboard: '/api/dashboard',
-      users: '/api/users',
-      contacts: '/api/contacts',
-      brands: '/api/brands',
-      items: '/api/items',
-      expenseTypes: '/api/expense-types',
-      transactions: '/api/transactions',
-      transactionItems: '/api/transaction-items',
-      transactionExpenses: '/api/transaction-expenses'
-    }
-  })
 })
 
 // API routes

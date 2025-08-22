@@ -60,6 +60,31 @@ To run the example locally, you need to:
 
 5. `npm run dev` to launch the development server.
 
+## Performance Monitoring
+
+This application includes built-in performance monitoring to help you identify slow endpoints and optimize your API performance.
+
+### Features
+- **Real-time Request Logging**: Every request is logged with execution time and performance indicators
+- **Console Monitoring**: Performance data available in server console logs
+
+### Environment Variables (Optional)
+```bash
+# Enable detailed logging (includes IP, User-Agent, Content-Length)
+PERFORMANCE_DETAILED_LOGGING=true
+
+# Log all requests (not just slow ones)
+PERFORMANCE_LOG_ALL=true
+```
+
+### Quick Start
+1. Start the server: `npm run dev`
+2. Make some API requests to your endpoints
+3. Check console logs for performance indicators
+4. Monitor for slow requests (marked with 🔴)
+
+For detailed documentation, see [PERFORMANCE_MONITORING.md](./PERFORMANCE_MONITORING.md).
+
 ## Learn more
 
 To learn more about Clerk and Express, check out the following resources:
