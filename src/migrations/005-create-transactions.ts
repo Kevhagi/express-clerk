@@ -36,12 +36,22 @@ export const up = async (queryInterface: QueryInterface) => {
       allowNull: false,
     },
     transaction_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
     },
     created_at: {
       type: DataTypes.DATE,

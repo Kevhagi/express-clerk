@@ -1,7 +1,7 @@
 import { QueryInterface, DataTypes } from 'sequelize';
 
 export const up = async (queryInterface: QueryInterface) => {
-  await queryInterface.createTable('expense_types', {
+  await queryInterface.createTable('contacts', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -10,6 +10,20 @@ export const up = async (queryInterface: QueryInterface) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
     },
     created_at: {
       type: DataTypes.DATE,
@@ -25,5 +39,5 @@ export const up = async (queryInterface: QueryInterface) => {
 };
 
 export const down = async (queryInterface: QueryInterface) => {
-  await queryInterface.dropTable('expense_types');
+  await queryInterface.dropTable('contacts');
 };

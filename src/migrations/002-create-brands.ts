@@ -11,6 +11,16 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,

@@ -30,6 +30,16 @@ export const up = async (queryInterface: QueryInterface) => {
       type: DataTypes.STRING,
       allowNull: false // auto-filled by trigger
     },
+    created_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
+    updated_by: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'system',
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
