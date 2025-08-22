@@ -1,31 +1,29 @@
 import { Request, Response } from 'express';
 import { TransactionItem, Transaction, Item, Brand } from '../models';
+import { TransactionItemService } from '../services/transactionItemService';
 import { CreateTransactionItemDTO, UpdateTransactionItemDTO } from '../types';
 
 // GET /api/transaction-items - Get all transaction items with related data
 export const getAllTransactionItems = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transactionItems = await TransactionItem.findAll({
-      include: [
-        {
-          model: Transaction,
-          as: 'transaction',
-          attributes: ['id', 'type', 'transaction_date'],
-        },
-        {
-          model: Item,
-          as: 'item',
-          include: [
-            {
-              model: Brand,
-              as: 'brand',
-              attributes: ['id', 'name'],
-            },
-          ],
-        },
-      ],
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const { transaction_id, item_id, transaction_type } = req.query;
+
+    const result = await TransactionItemService.findWithPagination(
+      page, 
+      limit, 
+      transaction_id as string,
+      item_id as string,
+      transaction_type as string
+    );
+
+    res.json({
+      data: result.transactionItems,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
-    res.json(transactionItems);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transaction items', details: error });
   }
@@ -61,7 +59,9 @@ export const getTransactionItemById = async (req: Request, res: Response): Promi
       return;
     }
     
-    res.json(transactionItem);
+    res.json({
+      data: transactionItem
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transaction item', details: error });
   }
@@ -121,7 +121,9 @@ export const createTransactionItem = async (req: Request, res: Response): Promis
       ],
     });
     
-    res.status(201).json(createdTransactionItem);
+    res.status(201).json({
+      data: createdTransactionItem
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create transaction item', details: error });
   }
@@ -193,7 +195,9 @@ export const updateTransactionItem = async (req: Request, res: Response): Promis
       ],
     });
     
-    res.json(updatedTransactionItem);
+    res.json({
+      data: updatedTransactionItem
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update transaction item', details: error });
   }
@@ -212,7 +216,7 @@ export const deleteTransactionItem = async (req: Request, res: Response): Promis
       return;
     }
     
-    res.status(204).send();
+    res.status(200).json({ message: 'Transaction item deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete transaction item', details: error });
   }

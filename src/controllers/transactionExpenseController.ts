@@ -1,25 +1,29 @@
 import { Request, Response } from 'express';
 import { TransactionExpense, Transaction, ExpenseType } from '../models';
+import { TransactionExpenseService } from '../services/transactionExpenseService';
 import { CreateTransactionExpenseDTO, UpdateTransactionExpenseDTO } from '../types';
 
 // GET /api/transaction-expenses - Get all transaction expenses with related data
 export const getAllTransactionExpenses = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transactionExpenses = await TransactionExpense.findAll({
-      include: [
-        {
-          model: Transaction,
-          as: 'transaction',
-          attributes: ['id', 'type', 'transaction_date'],
-        },
-        {
-          model: ExpenseType,
-          as: 'expenseType',
-          attributes: ['id', 'name'],
-        },
-      ],
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const { transaction_id, expense_type_id, transaction_type } = req.query;
+
+    const result = await TransactionExpenseService.findWithPagination(
+      page, 
+      limit, 
+      transaction_id as string,
+      expense_type_id as string,
+      transaction_type as string
+    );
+
+    res.json({
+      data: result.transactionExpenses,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
-    res.json(transactionExpenses);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transaction expenses', details: error });
   }
@@ -49,7 +53,9 @@ export const getTransactionExpenseById = async (req: Request, res: Response): Pr
       return;
     }
     
-    res.json(transactionExpense);
+    res.json({
+      data: transactionExpense
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transaction expense', details: error });
   }
@@ -103,7 +109,9 @@ export const createTransactionExpense = async (req: Request, res: Response): Pro
       ],
     });
     
-    res.status(201).json(createdTransactionExpense);
+    res.status(201).json({
+      data: createdTransactionExpense
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create transaction expense', details: error });
   }
@@ -169,7 +177,9 @@ export const updateTransactionExpense = async (req: Request, res: Response): Pro
       ],
     });
     
-    res.json(updatedTransactionExpense);
+    res.json({
+      data: updatedTransactionExpense
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update transaction expense', details: error });
   }
@@ -188,7 +198,7 @@ export const deleteTransactionExpense = async (req: Request, res: Response): Pro
       return;
     }
     
-    res.status(204).send();
+    res.status(200).json({ message: 'Transaction expense deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete transaction expense', details: error });
   }

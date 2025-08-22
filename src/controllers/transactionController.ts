@@ -1,53 +1,31 @@
 import { Request, Response } from 'express';
-import { Transaction, Contact, TransactionItem, TransactionExpense, Item, Brand, ExpenseType } from '../models';
-import { CreateTransactionDTO, UpdateTransactionDTO } from '../types';
+import { TransactionService } from '../services/transactionService';
+import { Transaction, Contact } from '../models';
+import { CreateTransactionDTO, CreateTransactionPayloadDTO, UpdateTransactionDTO } from '../types';
 
 // GET /api/transactions - Get all transactions with related data
 export const getAllTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transactions = await Transaction.findAll({
-      include: [
-        {
-          model: Contact,
-          as: 'supplier',
-          attributes: ['id', 'name', 'phone'],
-        },
-        {
-          model: Contact,
-          as: 'customer',
-          attributes: ['id', 'name', 'phone'],
-        },
-        {
-          model: TransactionItem,
-          as: 'transactionItems',
-          include: [
-            {
-              model: Item,
-              as: 'item',
-              include: [
-                {
-                  model: Brand,
-                  as: 'brand',
-                  attributes: ['id', 'name'],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          model: TransactionExpense,
-          as: 'transactionExpenses',
-          include: [
-            {
-              model: ExpenseType,
-              as: 'expenseType',
-              attributes: ['id', 'name'],
-            },
-          ],
-        },
-      ],
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const { type, supplier_id, customer_id, start_date, end_date } = req.query;
+
+    const result = await TransactionService.findWithPagination(
+      page, 
+      limit, 
+      type as string,
+      supplier_id as string,
+      customer_id as string,
+      start_date as string,
+      end_date as string
+    );
+
+    res.json({
+      data: result.transactions,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
-    res.json(transactions);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transactions', details: error });
   }
@@ -57,55 +35,16 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
 export const getTransactionById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const transaction = await Transaction.findByPk(id, {
-      include: [
-        {
-          model: Contact,
-          as: 'supplier',
-          attributes: ['id', 'name', 'phone'],
-        },
-        {
-          model: Contact,
-          as: 'customer',
-          attributes: ['id', 'name', 'phone'],
-        },
-        {
-          model: TransactionItem,
-          as: 'transactionItems',
-          include: [
-            {
-              model: Item,
-              as: 'item',
-              include: [
-                {
-                  model: Brand,
-                  as: 'brand',
-                  attributes: ['id', 'name'],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          model: TransactionExpense,
-          as: 'transactionExpenses',
-          include: [
-            {
-              model: ExpenseType,
-              as: 'expenseType',
-              attributes: ['id', 'name'],
-            },
-          ],
-        },
-      ],
-    });
+    const transaction = await TransactionService.findById(id);
     
     if (!transaction) {
       res.status(404).json({ error: 'Transaction not found' });
       return;
     }
     
-    res.json(transaction);
+    res.json({
+      data: transaction
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transaction', details: error });
   }
@@ -124,52 +63,17 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
 */
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transactionData: CreateTransactionDTO = req.body;
-    
-    // Add audit fields from clerk ID
-    const transactionWithAudit = {
-      ...transactionData,
-      created_by: req.clerkId!,
-      updated_by: req.clerkId!
-    };
-    
-    // Verify supplier exists if provided
-    if (transactionData.supplier_id) {
-      const supplier = await Contact.findByPk(transactionData.supplier_id);
-      if (!supplier) {
-        res.status(400).json({ error: 'Supplier not found' });
-        return;
-      }
-    }
-    
-    // Verify customer exists if provided
-    if (transactionData.customer_id) {
-      const customer = await Contact.findByPk(transactionData.customer_id);
-      if (!customer) {
-        res.status(400).json({ error: 'Customer not found' });
-        return;
-      }
-    }
-    
-    const transaction = await Transaction.create(transactionWithAudit);
-    const createdTransaction = await Transaction.findByPk(transaction.id, {
-      include: [
-        {
-          model: Contact,
-          as: 'supplier',
-          attributes: ['id', 'name', 'phone'],
-        },
-        {
-          model: Contact,
-          as: 'customer',
-          attributes: ['id', 'name', 'phone'],
-        },
-      ],
+    const transactionData: CreateTransactionPayloadDTO = req.body;
+    const createdTransaction = await TransactionService.create(transactionData, req.clerkId!);
+    res.status(201).json({
+      data: createdTransaction
     });
-    
-    res.status(201).json(createdTransaction);
   } catch (error) {
-    res.status(400).json({ error: 'Failed to create transaction', details: error });
+    if (error instanceof Error && error.message.includes('not found')) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'Failed to create transaction', details: error });
+    }
   }
 };
 
@@ -237,7 +141,9 @@ export const updateTransaction = async (req: Request, res: Response): Promise<vo
       ],
     });
     
-    res.json(updatedTransaction);
+    res.json({
+      data: updatedTransaction
+    });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update transaction', details: error });
   }
@@ -256,7 +162,7 @@ export const deleteTransaction = async (req: Request, res: Response): Promise<vo
       return;
     }
     
-    res.status(204).send();
+    res.status(200).json({ message: 'Transaction deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete transaction', details: error });
   }
