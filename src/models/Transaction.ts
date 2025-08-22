@@ -8,7 +8,7 @@ class Transaction extends Model<ITransaction> implements ITransaction {
   public customer_id?: string;
   public type!: TransactionType;
   public total!: number;
-  public transaction_date!: Date;
+  public transaction_date!: string | Date;
   public notes?: string;
   public created_by!: string;
   public updated_by!: string;
@@ -48,7 +48,7 @@ Transaction.init(
       allowNull: false,
     },
     transaction_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     notes: {

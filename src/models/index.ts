@@ -1,5 +1,4 @@
 import sequelize from '../config/database';
-import User from './User';
 import Contact from './Contact';
 import Brand from './Brand';
 import Item from './Item';
@@ -9,8 +8,6 @@ import TransactionItem from './TransactionItem';
 import TransactionExpense from './TransactionExpense';
 
 // Define associations
-// User associations
-// Removed user_id from Transaction; no direct association
 
 // Contact associations
 Contact.hasMany(Transaction, { foreignKey: 'supplier_id', as: 'supplierTransactions' });
@@ -27,7 +24,6 @@ Item.hasMany(TransactionItem, { foreignKey: 'item_id', as: 'transactionItems' })
 ExpenseType.hasMany(TransactionExpense, { foreignKey: 'expense_type_id', as: 'transactionExpenses' });
 
 // Transaction associations
-// Removed user association from Transaction
 Transaction.belongsTo(Contact, { foreignKey: 'supplier_id', as: 'supplier' });
 Transaction.belongsTo(Contact, { foreignKey: 'customer_id', as: 'customer' });
 Transaction.hasMany(TransactionItem, { foreignKey: 'transaction_id', as: 'transactionItems' });
@@ -44,7 +40,6 @@ TransactionExpense.belongsTo(ExpenseType, { foreignKey: 'expense_type_id', as: '
 // Export all models
 export {
   sequelize,
-  User,
   Contact,
   Brand,
   Item,

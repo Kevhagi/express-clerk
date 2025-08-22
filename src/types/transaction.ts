@@ -9,7 +9,7 @@ export interface ITransaction {
     customer_id?: string;
     type: TransactionType;
     total: number;
-    transaction_date: Date;
+    transaction_date: string | Date;
     notes?: string;
     created_by: string;
     updated_by: string;

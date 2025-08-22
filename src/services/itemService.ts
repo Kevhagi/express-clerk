@@ -17,23 +17,7 @@ export class ItemService {
     }
   }
 
-  // Get all items
-  static async findAll(): Promise<IItem[]> {
-    try {
-      const items = await Item.findAll({
-        include: [
-          {
-            model: Brand,
-            as: 'brand',
-            attributes: ['id', 'name']
-          }
-        ]
-      });
-      return items.map(item => item.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to fetch items: ${error}`);
-    }
-  }
+
 
   // Get item by ID
   static async findById(id: string): Promise<IItem | null> {
@@ -95,74 +79,13 @@ export class ItemService {
     }
   }
 
-  // Check if item exists
-  static async exists(id: string): Promise<boolean> {
-    try {
-      const item = await Item.findByPk(id);
-      return !!item;
-    } catch (error) {
-      throw new Error(`Failed to check item existence with ID ${id}: ${error}`);
-    }
-  }
 
-  // Find items by brand ID
-  static async findByBrandId(brandId: string): Promise<IItem[]> {
-    try {
-      const items = await Item.findAll({
-        where: { brand_id: brandId },
-        include: [
-          {
-            model: Brand,
-            as: 'brand',
-            attributes: ['id', 'name']
-          }
-        ]
-      });
-      return items.map(item => item.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to fetch items by brand ID ${brandId}: ${error}`);
-    }
-  }
 
-  // Find items by model name (partial match, case insensitive)
-  static async findByModelName(modelName: string): Promise<IItem[]> {
-    try {
-      const items = await Item.findAll({
-        where: {
-          model_name: {
-            [Op.iLike]: `%${modelName}%`
-          }
-        },
-        include: [
-          {
-            model: Brand,
-            as: 'brand',
-            attributes: ['id', 'name']
-          }
-        ]
-      });
-      return items.map(item => item.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to search items by model name: ${error}`);
-    }
-  }
 
-  // Check if model name exists (no error throwing)
-  static async isModelNameExists(modelName: string): Promise<boolean> {
-    try {
-      const count = await Item.count({
-        where: {
-          model_name: {
-            [Op.iLike]: `%${modelName}%`
-          }
-        }
-      });
-      return count > 0;
-    } catch (error) {
-      // Silently return false if there's an error
-      return false;
-    }
-  }
+
+
+
+
 
   // Find items with pagination and search
   static async findWithPagination(

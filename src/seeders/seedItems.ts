@@ -1,7 +1,26 @@
-import { BrandService, ItemService } from '../services';
+import { Brand, Item } from '../models';
 
-// Sample item data
-  const items = [
+export const seedItems = async () => {
+  try {
+    // Check if items already exist
+    const existingItems = await Item.count();
+    if (existingItems > 0) {
+      console.log(`⚠️  Items already exist (${existingItems} found). Skipping item seeding.`);
+      return;
+    }
+
+    // Fetch existing brands
+    console.log('📱 Fetching existing brands...');
+    const createdBrands: { [key: string]: string } = {};
+    
+    const allBrands = await Brand.findAll();
+    for (const brand of allBrands) {
+      createdBrands[brand.name] = brand.id!;
+      console.log(`ℹ️  Found brand: ${brand.name} (ID: ${brand.id})`);
+    }
+
+    // Sample item data
+    const items = [
     // Apple iPhones
     {
       brand_name: 'Apple',
@@ -217,65 +236,29 @@ import { BrandService, ItemService } from '../services';
     }
   ];
 
-export const seedItems = async (): Promise<void> => {
-  try {
-    console.log('🌱 Starting item seeding...\n');
-
-    // Fetch existing brands
-    console.log('📱 Fetching existing brands...');
-    const createdBrands: { [key: string]: string } = {};
-    
-    const allBrands = await BrandService.findAll();
-    for (const brand of allBrands) {
-      createdBrands[brand.name] = brand.id!;
-      console.log(`ℹ️  Found brand: ${brand.name} (ID: ${brand.id})`);
-    }
-
-    console.log('\n📦 Creating items...');
-    let createdItemsCount = 0;
-    let skippedItemsCount = 0;
-
-    for (const itemData of items) {
-      try {
-        const brandName = itemData.brand_name;
-        const brand = createdBrands[brandName];
-        
-        if (!brand) {
-          console.error(`❌ Brand not found for item: ${itemData.model_name}`);
-          continue;
-        }
-
-        // Check if item already exists (by model name and brand)
-        const itemExists = await ItemService.isModelNameExists(itemData.model_name);
-
-        if (!itemExists) {
-          const item = await ItemService.create({
-            brand_id: brand,
-            model_name: itemData.model_name,
-            ram_gb: itemData.ram_gb,
-            storage_gb: itemData.storage_gb,
-          });
-          
-          console.log(`✅ Created item: ${item.display_name} (ID: ${item.id})`);
-          createdItemsCount++;
-        } else {
-          console.log(`ℹ️  Item already exists: ${itemData.model_name}`);
-          skippedItemsCount++;
-        }
-      } catch (error) {
-        console.error(`❌ Failed to create item ${itemData.model_name}:`, error);
+    // Prepare items data with brand IDs
+    const itemsToCreate = items.map(itemData => {
+      const brandName = itemData.brand_name;
+      const brandId = createdBrands[brandName];
+      
+      if (!brandId) {
+        throw new Error(`Brand not found: ${brandName}`);
       }
-    }
+      
+      return {
+        brand_id: brandId,
+        model_name: itemData.model_name,
+        ram_gb: itemData.ram_gb,
+        storage_gb: itemData.storage_gb,
+        created_by: 'system',
+        updated_by: 'system'
+      };
+    });
 
-    console.log('\n🎉 Seeding completed!');
-    console.log(`📊 Summary:`);
-    console.log(`   - Brands: ${Object.keys(createdBrands).length}`);
-    console.log(`   - Items created: ${createdItemsCount}`);
-    console.log(`   - Items skipped: ${skippedItemsCount}`);
-    console.log(`   - Total items: ${items.length}`);
-
+    await Item.bulkCreate(itemsToCreate);
+    console.log(`✅ Created ${items.length} items successfully`);
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('❌ Error seeding items:', error);
     throw error;
   }
 };

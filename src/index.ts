@@ -6,6 +6,7 @@ import { initDatabase } from './models'
 import apiRoutes from './routes'
 import { seedBrands } from './seeders/seedBrands'
 import { seedItems } from './seeders/seedItems'
+import { seedContacts } from './seeders/seedContacts'
 import { 
   clerkIdInjectorWithLogging, 
   performanceLogger
@@ -88,20 +89,23 @@ const startServer = async () => {
     await initDatabase()
     
     // Seed initial data
-    // console.log('🌱 Starting data seeding...')
-    // if (process.env.NODE_ENV === 'development') {
-    //   try {
-    //     await seedBrands()
-    //     console.log('✅ Brands seeded successfully')
+    console.log('🌱 Starting data seeding...')
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        await seedContacts()
+        console.log('✅ Contacts seeded successfully')
         
-    //     await seedItems()
-    //     console.log('✅ Items seeded successfully')
+        await seedBrands()
+        console.log('✅ Brands seeded successfully')
         
-    //     console.log('🎉 All seeding completed successfully!')
-    //   } catch (seedingError) {
-    //     console.warn('⚠️  Seeding failed, but server will continue:', seedingError)
-    //   }
-    // }
+        await seedItems()
+        console.log('✅ Items seeded successfully')
+        
+        console.log('🎉 All seeding completed successfully!')
+      } catch (seedingError) {
+        console.warn('⚠️  Seeding failed, but server will continue:', seedingError)
+      }
+    }
     
     // Start the server
     app.listen(PORT, () => {

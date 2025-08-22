@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TransactionService } from '../services/transactionService';
 import { Transaction, Contact } from '../models';
-import { CreateTransactionDTO, CreateTransactionPayloadDTO, UpdateTransactionDTO } from '../types';
+import { CreateTransactionPayloadDTO, UpdateTransactionDTO } from '../types';
 
 // GET /api/transactions - Get all transactions with related data
 export const getAllTransactions = async (req: Request, res: Response): Promise<void> => {
@@ -57,7 +57,7 @@ export const getTransactionById = async (req: Request, res: Response): Promise<v
   "customer_id": null,
   "type": "buy",
   "total": 15000000.00,
-  "transaction_date": "2024-01-15T10:30:00.000Z",
+  "transaction_date": "2024-01-15",
   "notes": "Purchase of smartphones for inventory"
 }
 */
@@ -84,7 +84,7 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
   "customer_id": 1,
   "type": "sell",
   "total": 18000000.00,
-  "transaction_date": "2024-01-16T14:30:00.000Z",
+  "transaction_date": "2024-01-16",
   "notes": "Sale of smartphones"
 }
 */

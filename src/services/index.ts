@@ -1,5 +1,5 @@
 // Export all services
-export { UserService } from './userService';
+
 export { ContactService } from './contactService';
 export { BrandService } from './brandService';
 export { ItemService } from './itemService';

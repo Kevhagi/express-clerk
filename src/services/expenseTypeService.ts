@@ -69,25 +69,7 @@ export class ExpenseTypeService {
     }
   }
 
-  // Check if expense type exists
-  static async exists(id: string): Promise<boolean> {
-    try {
-      const expenseType = await ExpenseType.findByPk(id);
-      return !!expenseType;
-    } catch (error) {
-      throw new Error(`Failed to check expense type existence with ID ${id}: ${error}`);
-    }
-  }
 
-  // Find expense type by name (exact match)
-  static async findByName(name: string): Promise<IExpenseType | null> {
-    try {
-      const expenseType = await ExpenseType.findOne({
-        where: { name }
-      });
-      return expenseType ? expenseType.toJSON() : null;
-    } catch (error) {
-      throw new Error(`Failed to find expense type by name: ${error}`);
-    }
-  }
+
+
 }

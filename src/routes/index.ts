@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import userRoutes from './userRoutes';
 import contactRoutes from './contactRoutes';
 import brandRoutes from './brandRoutes';
 import expenseTypeRoutes from './expenseTypeRoutes';
@@ -12,7 +11,6 @@ import dashboardRoutes from './dashboardRoutes';
 const router = Router();
 
 // Mount all routes
-router.use('/users', userRoutes);
 router.use('/contacts', contactRoutes);
 router.use('/brands', brandRoutes);
 router.use('/expense-types', expenseTypeRoutes);

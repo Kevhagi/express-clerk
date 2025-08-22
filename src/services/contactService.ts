@@ -17,15 +17,7 @@ export class ContactService {
     }
   }
 
-  // Get all contacts
-  static async findAll(): Promise<IContact[]> {
-    try {
-      const contacts = await Contact.findAll();
-      return contacts.map(contact => contact.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to fetch contacts: ${error}`);
-    }
-  }
+
 
   // Get contact by ID
   static async findById(id: string): Promise<IContact | null> {
@@ -70,31 +62,9 @@ export class ContactService {
     }
   }
 
-  // Check if contact exists
-  static async exists(id: string): Promise<boolean> {
-    try {
-      const contact = await Contact.findByPk(id);
-      return !!contact;
-    } catch (error) {
-      throw new Error(`Failed to check contact existence with ID ${id}: ${error}`);
-    }
-  }
 
-  // Find contacts by name (partial match)
-  static async findByName(name: string): Promise<IContact[]> {
-    try {
-      const contacts = await Contact.findAll({
-        where: {
-          name: {
-            [Op.like]: `%${name}%`
-          }
-        }
-      });
-      return contacts.map(contact => contact.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to search contacts by name: ${error}`);
-    }
-  }
+
+
 
   // Find contacts with pagination and search
   static async findWithPagination(page: number, limit: number, name?: string, phone?: string): Promise<{

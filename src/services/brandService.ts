@@ -16,15 +16,7 @@ export class BrandService {
     }
   }
 
-  // Get all brands
-  static async findAll(): Promise<IBrand[]> {
-    try {
-      const brands = await Brand.findAll();
-      return brands.map(brand => brand.toJSON());
-    } catch (error) {
-      throw new Error(`Failed to fetch brands: ${error}`);
-    }
-  }
+
 
   // Get brand by ID
   static async findById(id: string): Promise<IBrand | null> {
@@ -69,36 +61,11 @@ export class BrandService {
     }
   }
 
-  // Check if brand exists
-  static async exists(id: string): Promise<boolean> {
-    try {
-      const brand = await Brand.findByPk(id);
-      return !!brand;
-    } catch (error) {
-      throw new Error(`Failed to check brand existence with ID ${id}: ${error}`);
-    }
-  }
 
-  // Find brand by name (exact match)
-  static async findByName(name: string): Promise<IBrand | null> {
-    try {
-      const brand = await Brand.findOne({
-        where: { name }
-      });
-      return brand ? brand.toJSON() : null;
-    } catch (error) {
-      throw new Error(`Failed to find brand by name: ${error}`);
-    }
-  }
 
-  // Get total count of brands
-  static async count(): Promise<number> {
-    try {
-      return await Brand.count();
-    } catch (error) {
-      throw new Error(`Failed to count brands: ${error}`);
-    }
-  }
+
+
+
 
   // Find brands with pagination
   static async findWithPagination(page: number, limit: number): Promise<{
