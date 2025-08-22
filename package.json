@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
+    "build": "tsc --build --clean",
     "dev": "tsx watch src/index.ts",
     "sequelize:drop:all": "npx sequelize-cli db:migrate:undo:all",
     "sequelize:migrate": "npx sequelize-cli db:migrate"
