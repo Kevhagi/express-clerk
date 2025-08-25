@@ -7,3 +7,4 @@ export { ExpenseTypeService } from './expenseTypeService';
 export { TransactionService } from './transactionService';
 export { TransactionItemService } from './transactionItemService';
 export { TransactionExpenseService } from './transactionExpenseService';
+export { DashboardService } from './dashboardService';

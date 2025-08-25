@@ -1,4 +1,4 @@
-export type ChangeType = 'UP' | 'DOWN';
+export type ChangeType = 'UP' | 'DOWN' | 'STAY';
 
 export interface ChangeData {
   type: ChangeType;
