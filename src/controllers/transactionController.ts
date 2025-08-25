@@ -8,14 +8,26 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const { type, supplier_id, customer_id, start_date, end_date } = req.query;
+    const { type, contact_id, start_date, end_date } = req.query;
+
+    // Handle contact_id parameter from frontend
+    let finalSupplierId: string | undefined;
+    let finalCustomerId: string | undefined;
+
+    if (contact_id) {
+      if (type === 'buy') {
+        finalSupplierId = contact_id as string;
+      } else if (type === 'sell') {
+        finalCustomerId = contact_id as string;
+      }
+    }
 
     const result = await TransactionService.findWithPagination(
       page, 
       limit, 
       type as string,
-      supplier_id as string,
-      customer_id as string,
+      finalSupplierId,
+      finalCustomerId,
       start_date as string,
       end_date as string
     );
