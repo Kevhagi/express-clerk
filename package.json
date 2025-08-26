@@ -5,6 +5,7 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "build": "tsc --build --clean",
+    "build:deploy": "tsc --build --clean && npm run sequelize:migrate",
     "dev": "tsx watch src/index.ts",
     "sequelize:drop:all": "npx sequelize-cli db:migrate:undo:all",
     "sequelize:migrate": "npx sequelize-cli db:migrate"
