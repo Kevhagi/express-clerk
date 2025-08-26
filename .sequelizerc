@@ -1,11 +1,8 @@
 const path = require('path');
 
-// Get the project root directory
-const projectRoot = path.resolve(__dirname);
-
 module.exports = {
-  config: path.join(projectRoot, 'config', 'config.js'),
-  'models-path': path.join(projectRoot, 'models'),
-//   'seeders-path': path.join(projectRoot, 'seeders'),
-  'migrations-path': path.join(projectRoot, 'migrations')
+  config: path.resolve('src/config', 'config.ts'),
+  'models-path': path.resolve('src/models'),
+//   'seeders-path': path.resolve('src/seeders'),
+  'migrations-path': path.resolve('src/migrations')
 };
