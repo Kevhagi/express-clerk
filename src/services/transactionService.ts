@@ -66,12 +66,19 @@ export class TransactionService {
           }
         }
 
+        // Calculate total: sum of transaction items - sum of transaction expenses
+        const totalItems = transactionData.transaction_products.reduce((sum, product) => sum + product.sub_total, 0);
+        const totalExpenses = hasExpenses 
+          ? transactionData.transaction_expenses.reduce((sum, expense) => sum + expense.amount, 0)
+          : 0;
+        const calculatedTotal = totalItems - totalExpenses;
+
         // Create the main transaction record
         const transaction = await Transaction.create({
           supplier_id: transactionData.type === 'buy' ? transactionData.supplier_id : null,
           customer_id: transactionData.type === 'sell' ? transactionData.customer_id : null,
           type: transactionData.type,
-          total: transactionData.total,
+          total: calculatedTotal,
           transaction_date: this.parseToDateOnly(transactionData.transaction_date),
           notes: transactionData.notes,
           created_by: clerkId,
