@@ -49,7 +49,9 @@ export class DashboardService {
 
   private static calculateChange(current: number, previous: number): { type: 'UP' | 'DOWN' | 'STAY', percentage: number } {
     if (previous === 0) {
-      return { type: current > 0 ? 'UP' : 'STAY', percentage: current > 0 ? 100 : 0 };
+      if (current > 0) return { type: 'UP', percentage: 100 };
+      if (current < 0) return { type: 'DOWN', percentage: 100 };
+      return { type: 'STAY', percentage: 0 };
     }
     
     const change = ((current - previous) / previous) * 100;
@@ -65,41 +67,82 @@ export class DashboardService {
     };
   }
 
-  private static getVerdict(metric: string, change: { type: 'UP' | 'DOWN' | 'STAY', percentage: number }): string {
+  private static getVerdict(metric: string, change: { type: 'UP' | 'DOWN' | 'STAY', percentage: number }, current: number, previous: number, periodLabel: string): string {
+    // Handle case when current === 0 for daily comparisons
+    if (current === 0 && periodLabel === 'kemarin') {
+      switch (metric) {
+        case 'sales':
+          return 'Belum ada penjualan untuk hari ini';
+        case 'purchase':
+          return 'Belum ada pembelian untuk hari ini';
+        case 'expense':
+          return 'Belum ada pengeluaran untuk hari ini';
+        case 'profit':
+          return 'Belum ada profit untuk hari ini';
+        case 'initial_balance':
+          return 'Belum ada saldo awal untuk hari ini';
+        case 'final_balance':
+          return 'Belum ada saldo akhir untuk hari ini';
+        default:
+          return 'Belum ada aktivitas untuk hari ini';
+      }
+    }
+    
     switch (change.type) {
       case 'UP':
         switch (metric) {
           case 'sales':
-            return 'Penjualan meningkat';
+            if (previous === 0) {
+              return `Penjualan meningkat, ${periodLabel} tidak ada penjualan`;
+            }
+            return `Penjualan meningkat dibandingkan ${periodLabel}`;
           case 'purchase':
-            return 'Pembelian meningkat';
+            if (previous === 0) {
+              return `Pembelian meningkat, ${periodLabel} tidak ada pembelian`;
+            }
+            return `Pembelian meningkat dibandingkan ${periodLabel}`;
           case 'expense':
-            return 'Biaya meningkat';
+            if (previous === 0) {
+              return `Biaya meningkat, ${periodLabel} tidak ada pengeluaran`;
+            }
+            return 'Biaya meningkat, coba evaluasi';
           case 'profit':
-            return 'Profit meningkat';
+            if (previous === 0) {
+              return `Untung dibandingkan ${periodLabel}, ${periodLabel} hanya balik modal`;
+            }
+            if (current < 0) {
+              return `Masih rugi, tetapi keuntungan meningkat dibandingkan ${periodLabel}`;
+            }
+            return 'Keuntungan meningkat, pertahankan';
           case 'initial_balance':
             return 'Saldo awal meningkat';
           case 'final_balance':
             return 'Saldo akhir meningkat';
           default:
-            return 'Meningkat';
+            return `Meningkat dibandingkan ${periodLabel}`;
         }
       case 'DOWN':
         switch (metric) {
           case 'sales':
-            return 'Penjualan menurun';
+            return `Penjualan menurun dibandingkan ${periodLabel}`;
           case 'purchase':
-            return 'Pembelian menurun';
+            return `Pembelian menurun dibandingkan ${periodLabel}`;
           case 'expense':
-            return 'Biaya menurun';
+            return 'Biaya menurun, pertahankan';
           case 'profit':
-            return 'Profit menurun';
+            if (previous === 0) {
+              return `Rugi dibandingkan ${periodLabel}`;
+            }
+            if (current < 0) {
+              return `Rugi dibandingkan ${periodLabel}`;
+            }
+            return 'Keuntungan menurun, coba evaluasi';
           case 'initial_balance':
             return 'Saldo awal menurun';
           case 'final_balance':
             return 'Saldo akhir menurun';
           default:
-            return 'Menurun';
+            return `Menurun dibandingkan ${periodLabel}`;
         }
       case 'STAY':
         switch (metric) {
@@ -127,7 +170,8 @@ export class DashboardService {
     currentStartDate: string, 
     currentEndDate: string, 
     previousStartDate: string, 
-    previousEndDate: string
+    previousEndDate: string,
+    periodLabel: string
   ): Promise<{
     sales: MetricData;
     purchase: MetricData;
@@ -214,32 +258,32 @@ export class DashboardService {
       sales: {
         amount: parseFloat(data?.current_sales || '0'),
         change: this.calculateChange(parseFloat(data?.current_sales || '0'), parseFloat(data?.previous_sales || '0')),
-        verdict: this.getVerdict('sales', this.calculateChange(parseFloat(data?.current_sales || '0'), parseFloat(data?.previous_sales || '0')))
+        verdict: this.getVerdict('sales', this.calculateChange(parseFloat(data?.current_sales || '0'), parseFloat(data?.previous_sales || '0')), parseFloat(data?.current_sales || '0'), parseFloat(data?.previous_sales || '0'), periodLabel)
       },
       purchase: {
         amount: parseFloat(data?.current_purchase || '0'),
         change: this.calculateChange(parseFloat(data?.current_purchase || '0'), parseFloat(data?.previous_purchase || '0')),
-        verdict: this.getVerdict('purchase', this.calculateChange(parseFloat(data?.current_purchase || '0'), parseFloat(data?.previous_purchase || '0')))
+        verdict: this.getVerdict('purchase', this.calculateChange(parseFloat(data?.current_purchase || '0'), parseFloat(data?.previous_purchase || '0')), parseFloat(data?.current_purchase || '0'), parseFloat(data?.previous_purchase || '0'), periodLabel)
       },
       expense: {
         amount: parseFloat(data?.current_expense || '0'),
         change: this.calculateChange(parseFloat(data?.current_expense || '0'), parseFloat(data?.previous_expense || '0')),
-        verdict: this.getVerdict('expense', this.calculateChange(parseFloat(data?.current_expense || '0'), parseFloat(data?.previous_expense || '0')))
+        verdict: this.getVerdict('expense', this.calculateChange(parseFloat(data?.current_expense || '0'), parseFloat(data?.previous_expense || '0')), parseFloat(data?.current_expense || '0'), parseFloat(data?.previous_expense || '0'), periodLabel)
       },
       profit: {
         amount: parseFloat(data?.current_profit || '0'),
         change: this.calculateChange(parseFloat(data?.current_profit || '0'), parseFloat(data?.previous_profit || '0')),
-        verdict: this.getVerdict('profit', this.calculateChange(parseFloat(data?.current_profit || '0'), parseFloat(data?.previous_profit || '0')))
+        verdict: this.getVerdict('profit', this.calculateChange(parseFloat(data?.current_profit || '0'), parseFloat(data?.previous_profit || '0')), parseFloat(data?.current_profit || '0'), parseFloat(data?.previous_profit || '0'), periodLabel)
       },
       initial_balance: {
         amount: parseFloat(data?.current_initial_balance || '0'),
         change: this.calculateChange(parseFloat(data?.current_initial_balance || '0'), parseFloat(data?.previous_initial_balance || '0')),
-        verdict: this.getVerdict('initial_balance', this.calculateChange(parseFloat(data?.current_initial_balance || '0'), parseFloat(data?.previous_initial_balance || '0')))
+        verdict: this.getVerdict('initial_balance', this.calculateChange(parseFloat(data?.current_initial_balance || '0'), parseFloat(data?.previous_initial_balance || '0')), parseFloat(data?.current_initial_balance || '0'), parseFloat(data?.previous_initial_balance || '0'), periodLabel)
       },
       final_balance: {
         amount: parseFloat(data?.current_final_balance || '0'),
         change: this.calculateChange(parseFloat(data?.current_final_balance || '0'), parseFloat(data?.previous_final_balance || '0')),
-        verdict: this.getVerdict('final_balance', this.calculateChange(parseFloat(data?.current_final_balance || '0'), parseFloat(data?.previous_final_balance || '0')))
+        verdict: this.getVerdict('final_balance', this.calculateChange(parseFloat(data?.current_final_balance || '0'), parseFloat(data?.previous_final_balance || '0')), parseFloat(data?.current_final_balance || '0'), parseFloat(data?.previous_final_balance || '0'), periodLabel)
       }
     };
   }
@@ -279,8 +323,8 @@ export class DashboardService {
     });
 
     const [daily, monthly] = await Promise.all([
-      this.calculatePeriodData(todayStr, todayStr, yesterdayStr, yesterdayStr),
-      this.calculatePeriodData(currentMonth.startStr, currentMonth.endStr, previousMonth.startStr, previousMonth.endStr)
+      this.calculatePeriodData(todayStr, todayStr, yesterdayStr, yesterdayStr, 'kemarin'),
+      this.calculatePeriodData(currentMonth.startStr, currentMonth.endStr, previousMonth.startStr, previousMonth.endStr, 'bulan lalu')
     ]);
 
     const dashboardData = {
