@@ -19,7 +19,9 @@ export class ExpenseTypeService {
   // Get all expense types
   static async findAll(): Promise<IExpenseType[]> {
     try {
-      const expenseTypes = await ExpenseType.findAll();
+      const expenseTypes = await ExpenseType.findAll({
+        order: [['name', 'ASC']]
+      });
       return expenseTypes.map(expenseType => expenseType.toJSON());
     } catch (error) {
       throw new Error(`Failed to fetch expense types: ${error}`);
