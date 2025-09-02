@@ -11,6 +11,7 @@ import {
 import { Op } from 'sequelize';
 import { 
   CreateTransactionPayloadDTO,
+  UpdateTransactionWithDetailsDTO,
   TransactionResponse,
   PaginatedTransactionResponse,
 } from '../types';
@@ -66,12 +67,17 @@ export class TransactionService {
           }
         }
 
-        // Calculate total: sum of transaction items - sum of transaction expenses
+        // Calculate total based on transaction type
         const totalItems = transactionData.transaction_products.reduce((sum, product) => sum + product.sub_total, 0);
         const totalExpenses = hasExpenses 
           ? transactionData.transaction_expenses.reduce((sum, expense) => sum + expense.amount, 0)
           : 0;
-        const calculatedTotal = totalItems - totalExpenses;
+        
+        // For buy transactions: totalItems + totalExpenses
+        // For sell transactions: totalItems - totalExpenses
+        const calculatedTotal = transactionData.type === 'buy' 
+          ? totalItems + totalExpenses 
+          : totalItems - totalExpenses;
 
         // Create the main transaction record
         const transaction = await Transaction.create({
@@ -369,6 +375,210 @@ export class TransactionService {
       } as TransactionResponse;
     } catch (error) {
       throw new Error(`Failed to fetch transaction with ID ${id}: ${error}`);
+    }
+  }
+
+  // Update transaction with details (items and expenses)
+  static async update(
+    id: string,
+    updateData: UpdateTransactionWithDetailsDTO,
+    clerkId: string
+  ): Promise<TransactionResponse> {
+    try {
+      // Verify transaction exists
+      const existingTransaction = await Transaction.findByPk(id);
+      if (!existingTransaction) {
+        throw new Error('Transaction not found');
+      }
+
+      // Verify supplier exists if being updated
+      if (updateData.supplier_id) {
+        const supplier = await Contact.findByPk(updateData.supplier_id);
+        if (!supplier) {
+          throw new Error('Supplier not found');
+        }
+      }
+
+      // Verify customer exists if being updated
+      if (updateData.customer_id) {
+        const customer = await Contact.findByPk(updateData.customer_id);
+        if (!customer) {
+          throw new Error('Customer not found');
+        }
+      }
+
+      // Use transaction to ensure data consistency
+      await sequelize.transaction(async (t) => {
+        // Update basic transaction fields
+        const basicUpdateData = {
+          supplier_id: updateData.supplier_id,
+          customer_id: updateData.customer_id,
+          type: updateData.type,
+          transaction_date: updateData.transaction_date,
+          notes: updateData.notes,
+          updated_by: clerkId
+        };
+
+        await Transaction.update(basicUpdateData, {
+          where: { id },
+          transaction: t
+        });
+
+        // Handle transaction expenses
+        if (updateData.transaction_expenses !== undefined) {
+          if (updateData.transaction_expenses.length === 0) {
+            // Delete ALL existing expenses for this transaction
+            await TransactionExpense.destroy({
+              where: { transaction_id: id },
+              transaction: t
+            });
+          } else {
+            // Get IDs of expenses that should be kept (have an ID in the update data)
+            const expenseIdsToKeep = updateData.transaction_expenses
+              .filter(expense => expense.id)
+              .map(expense => expense.id);
+
+            // Delete expenses that are not in the update data (removed items)
+            if (expenseIdsToKeep.length > 0) {
+              await TransactionExpense.destroy({
+                where: {
+                  transaction_id: id,
+                  id: { [Op.notIn]: expenseIdsToKeep }
+                },
+                transaction: t
+              });
+            } else {
+              // If no existing expenses to keep, delete all existing expenses
+              await TransactionExpense.destroy({
+                where: { transaction_id: id },
+                transaction: t
+              });
+            }
+
+            // Update or create transaction expenses
+            for (const expense of updateData.transaction_expenses) {
+              if (expense.id) {
+                // Update existing expense
+                await TransactionExpense.update({
+                  expense_type_id: expense.expense_type,
+                  amount: expense.amount,
+                  notes: expense.notes,
+                  subtotal: expense.amount,
+                  updated_by: clerkId
+                }, {
+                  where: {
+                    id: expense.id,
+                    transaction_id: id
+                  },
+                  transaction: t
+                });
+              } else {
+                // Create new expense
+                await TransactionExpense.create({
+                  transaction_id: id,
+                  expense_type_id: expense.expense_type,
+                  amount: expense.amount,
+                  notes: expense.notes,
+                  subtotal: expense.amount,
+                  created_by: clerkId,
+                  updated_by: clerkId
+                }, { transaction: t });
+              }
+            }
+          }
+        }
+
+        // Handle transaction items
+        if (updateData.transaction_products !== undefined) {
+          if (updateData.transaction_products.length === 0) {
+            // Delete ALL existing items for this transaction
+            await TransactionItem.destroy({
+              where: { transaction_id: id },
+              transaction: t
+            });
+          } else {
+            // Get IDs of items that should be kept (have an ID in the update data)
+            const itemIdsToKeep = updateData.transaction_products
+              .filter(product => product.id)
+              .map(product => product.id);
+
+            // Delete items that are not in the update data (removed items)
+            if (itemIdsToKeep.length > 0) {
+              await TransactionItem.destroy({
+                where: {
+                  transaction_id: id,
+                  id: { [Op.notIn]: itemIdsToKeep }
+                },
+                transaction: t
+              });
+            } else {
+              // If no existing items to keep, delete all existing items
+              await TransactionItem.destroy({
+                where: { transaction_id: id },
+                transaction: t
+              });
+            }
+
+            // Update or create transaction items
+            for (const product of updateData.transaction_products) {
+              if (product.id) {
+                // Update existing item
+                await TransactionItem.update({
+                  item_id: product.product_id,
+                  unit_price: product.amount_per_product,
+                  qty: product.quantity,
+                  subtotal: product.sub_total,
+                  updated_by: clerkId
+                }, {
+                  where: {
+                    id: product.id,
+                    transaction_id: id
+                  },
+                  transaction: t
+                });
+              } else {
+                // Create new item
+                await TransactionItem.create({
+                  transaction_id: id,
+                  item_id: product.product_id,
+                  unit_price: product.amount_per_product,
+                  qty: product.quantity,
+                  subtotal: product.sub_total,
+                  created_by: clerkId,
+                  updated_by: clerkId
+                }, { transaction: t });
+              }
+            }
+          }
+        }
+
+        // Recalculate total based on updated items and expenses
+        const totalItems = await TransactionItem.sum('subtotal', {
+          where: { transaction_id: id },
+          transaction: t
+        }) || 0;
+
+        const totalExpenses = await TransactionExpense.sum('amount', {
+          where: { transaction_id: id },
+          transaction: t
+        }) || 0;
+
+        const calculatedTotal = totalItems - totalExpenses;
+
+        // Update transaction total
+        await Transaction.update({
+          total: calculatedTotal,
+          updated_by: clerkId
+        }, {
+          where: { id },
+          transaction: t
+        });
+      });
+
+      // Return updated transaction
+      return await this.findById(id) as TransactionResponse;
+    } catch (error) {
+      throw new Error(`Failed to update transaction: ${error}`);
     }
   }
 }

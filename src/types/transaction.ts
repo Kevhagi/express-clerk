@@ -115,6 +115,31 @@ export interface UpdateTransactionDTO {
     transaction_date?: Date;
     notes?: string;
 }
+
+// Comprehensive update DTO for transactions with items and expenses
+export interface UpdateTransactionWithDetailsDTO {
+    supplier_id?: string;
+    customer_id?: string;
+    type?: TransactionType;
+    transaction_date?: Date;
+    notes?: string;
+    transaction_products?: {
+        id?: string; // If provided, update existing item
+        product_id: string;
+        quantity: number;
+        amount_per_product: number;
+        sub_total: number;
+    }[];
+    transaction_expenses?: {
+        id?: string; // If provided, update existing expense
+        expense_type: string;
+        notes?: string;
+        amount: number;
+    }[];
+    // Array of IDs to delete
+    delete_expense_ids?: string[];
+    delete_item_ids?: string[];
+}
   
 export interface CreateTransactionItemDTO {
     transaction_id: string;
