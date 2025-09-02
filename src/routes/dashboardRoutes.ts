@@ -7,19 +7,7 @@ const router = Router();
 // GET /api/dashboard - Get dashboard data
 router.get('/', getDashboardData);
 
-// GET /api/dashboard/trends - Get historical trend analysis with LAG() function
-router.get('/trends', async (req, res) => {
-  try {
-    const days = parseInt(req.query.days as string) || 30;
-    const trendData = await DashboardService.getTrendAnalysis(days);
-    res.json({
-      data: trendData,
-      days: days
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch trend analysis', details: error });
-  }
-});
+
 
 // GET /api/dashboard/debug/purchase - Debug purchase calculation for a specific date
 router.get('/debug/purchase', async (req, res) => {
