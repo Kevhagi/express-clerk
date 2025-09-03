@@ -222,7 +222,7 @@ export class TransactionService {
     customerId?: string,
     startDate?: string,
     endDate?: string,
-    order: 'ASC' | 'DESC' = 'DESC'
+    isReport?: boolean
   ): Promise<PaginatedTransactionResponse> {
     try {
       const offset = (page - 1) * limit;
@@ -291,24 +291,105 @@ export class TransactionService {
                 attributes: ['name']
               }
             ]
-          }
+          },
+          // ...(isSummary ? [] : [
+          //   {
+          //     model: TransactionItem,
+          //     as: 'transactionItems',
+          //     include: [
+          //       {
+          //         model: Item,
+          //         as: 'item',
+          //         attributes: ['display_name'],
+          //       },
+          //     ]
+          //   },
+          //   {
+          //     model: TransactionExpense,
+          //     as: 'transactionExpenses',
+          //     include: [
+          //       {
+          //         model: ExpenseType,
+          //         as: 'expenseType',
+          //         attributes: ['name']
+          //       }
+          //     ]
+          //   }
+          // ])
         ],
         where: whereClause,
-        order: [['created_at', order]],
-        limit,
+        order: [['created_at', isReport ? 'ASC' : 'DESC']],
+        limit: isReport ? 1000 : limit,
         offset,
       });
 
-      return {
-        transactions: transactions.map(transaction => {
-          const transactionDataItem = transaction.toJSON() as any;
-          
-          // Calculate sub_total_products
+      // Calculate total debit and credit using optimal queries
+      let totalDebit = 0;
+      let totalCredit = 0;
+
+      if (!isReport) {
+        // For summary mode, calculate totals from the fetched transactions
+        transactions.forEach(transaction => {
+          const transactionData = transaction.toJSON() as any;
+          if (transactionData.type === 'sell') {
+            // Debit: sell transactions (income from sales)
+            totalDebit += parseFloat(transactionData.total || '0');
+          } else if (transactionData.type === 'buy') {
+            // Credit: buy transactions (expenses for purchases)
+            totalCredit += parseFloat(transactionData.total || '0');
+          }
+        });
+      } else {
+        // For report mode (full mode), use optimized separate queries for accurate totals
+        // Calculate total debit (sell transactions)
+        const debitResult = await Transaction.sum('total', {
+          where: {
+            ...whereClause,
+            type: 'sell'
+          }
+        });
+        totalDebit = debitResult || 0;
+
+        // Calculate total credit (buy transactions + expenses)
+        const buyResult = await Transaction.sum('total', {
+          where: {
+            ...whereClause,
+            type: 'buy'
+          }
+        });
+        const buyTotal = buyResult || 0;
+
+        // Calculate total expenses across all transactions
+        const expenseResult = await TransactionExpense.sum('subtotal', {
+          include: [{
+            model: Transaction,
+            as: 'transaction',
+            where: whereClause,
+            attributes: []
+          }]
+        } as any);
+        const expenseTotal = expenseResult || 0;
+
+        totalCredit = buyTotal + expenseTotal;
+      }
+
+      // Process transactions based on mode
+      const processedTransactions = transactions.map(transaction => {
+        const transactionDataItem = transaction.toJSON() as any;
+        
+        if (!isReport) {
+          // Summary mode: return basic data with zero totals
+          return {
+            ...transactionDataItem,
+            sub_total_products: '0.00',
+            sub_total_expenses: '0.00'
+          } as TransactionResponse;
+        } else {
+          // Report mode: calculate detailed totals
           const sub_total_products = transactionDataItem.transactionItems?.reduce((sum: number, item: any) => {
             return sum + parseFloat(item.subtotal || '0');
           }, 0) || 0;
           
-          // Calculate sub_total_expenses
           const sub_total_expenses = transactionDataItem.transactionExpenses?.reduce((sum: number, expense: any) => {
             return sum + parseFloat(expense.subtotal || '0');
           }, 0) || 0;
@@ -318,10 +399,16 @@ export class TransactionService {
             sub_total_products: sub_total_products.toFixed(2),
             sub_total_expenses: sub_total_expenses.toFixed(2)
           } as TransactionResponse;
-        }),
+        }
+      });
+
+      return {
+        transactions: processedTransactions,
         total,
         page,
-        limit,
+        limit: isReport ? 1000 : limit,
+        total_debit: totalDebit.toFixed(2),
+        total_credit: totalCredit.toFixed(2),
       };
     } catch (error) {
       throw new Error(`Failed to fetch transactions with pagination: ${error}`);

@@ -246,4 +246,6 @@ export interface PaginatedTransactionResponse {
     total: number;
     page: number;
     limit: number;
+    total_debit: string;
+    total_credit: string;
 }

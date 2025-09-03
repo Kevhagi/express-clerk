@@ -11,12 +11,13 @@ import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO } from '..
 // - contact_id: string (supplier_id for buy, customer_id for sell)
 // - start_date: string (YYYY-MM-DD)
 // - end_date: string (YYYY-MM-DD)
-// - order: 'ASC' | 'DESC' (default: 'DESC') - sorts by created_at
+// - is_report: string (default: false) - if 'true', returns full detailed data with accurate totals; if false, returns summary data
+// Response includes total_debit (sell transactions) and total_credit (buy transactions + expenses)
 export const getAllTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const { type, contact_id, start_date, end_date, order } = req.query;
+    const { type, contact_id, start_date, end_date, is_report } = req.query;
 
     // Handle contact_id parameter from frontend
     let finalSupplierId: string | undefined;
@@ -38,7 +39,7 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
       finalCustomerId,
       start_date as string,
       end_date as string,
-      (order as 'ASC' | 'DESC') || 'DESC'
+      Boolean(is_report)
     );
 
     res.json({
@@ -46,6 +47,8 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
       total: result.total,
       page: result.page,
       limit: result.limit,
+      total_debit: result.total_debit,
+      total_credit: result.total_credit,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch transactions', details: error });
