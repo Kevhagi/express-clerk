@@ -376,30 +376,20 @@ export class TransactionService {
       // Process transactions based on mode
       const processedTransactions = transactions.map(transaction => {
         const transactionDataItem = transaction.toJSON() as any;
+
+        const sub_total_products = transactionDataItem.transactionItems?.reduce((sum: number, item: any) => {
+          return sum + parseFloat(item.subtotal || '0');
+        }, 0) || 0;
         
-        if (!isReport) {
-          // Summary mode: return basic data with zero totals
-          return {
-            ...transactionDataItem,
-            sub_total_products: '0.00',
-            sub_total_expenses: '0.00'
-          } as TransactionResponse;
-        } else {
-          // Report mode: calculate detailed totals
-          const sub_total_products = transactionDataItem.transactionItems?.reduce((sum: number, item: any) => {
-            return sum + parseFloat(item.subtotal || '0');
-          }, 0) || 0;
-          
-          const sub_total_expenses = transactionDataItem.transactionExpenses?.reduce((sum: number, expense: any) => {
-            return sum + parseFloat(expense.subtotal || '0');
-          }, 0) || 0;
-          
-          return {
-            ...transactionDataItem,
-            sub_total_products: sub_total_products.toFixed(2),
-            sub_total_expenses: sub_total_expenses.toFixed(2)
-          } as TransactionResponse;
-        }
+        const sub_total_expenses = transactionDataItem.transactionExpenses?.reduce((sum: number, expense: any) => {
+          return sum + parseFloat(expense.subtotal || '0');
+        }, 0) || 0;
+        
+        return {
+          ...transactionDataItem,
+          sub_total_products: sub_total_products.toFixed(2),
+          sub_total_expenses: sub_total_expenses.toFixed(2)
+        } as TransactionResponse;
       });
 
       return {
