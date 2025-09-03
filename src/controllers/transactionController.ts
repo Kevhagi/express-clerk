@@ -4,11 +4,19 @@ import { Transaction } from '../models';
 import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO } from '../types';
 
 // GET /api/transactions - Get all transactions with related data
+// Query parameters:
+// - page: number (default: 1)
+// - limit: number (default: 10)
+// - type: 'buy' | 'sell'
+// - contact_id: string (supplier_id for buy, customer_id for sell)
+// - start_date: string (YYYY-MM-DD)
+// - end_date: string (YYYY-MM-DD)
+// - order: 'ASC' | 'DESC' (default: 'DESC') - sorts by created_at
 export const getAllTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const { type, contact_id, start_date, end_date } = req.query;
+    const { type, contact_id, start_date, end_date, order } = req.query;
 
     // Handle contact_id parameter from frontend
     let finalSupplierId: string | undefined;
@@ -29,7 +37,8 @@ export const getAllTransactions = async (req: Request, res: Response): Promise<v
       finalSupplierId,
       finalCustomerId,
       start_date as string,
-      end_date as string
+      end_date as string,
+      (order as 'ASC' | 'DESC') || 'DESC'
     );
 
     res.json({

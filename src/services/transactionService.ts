@@ -213,8 +213,6 @@ export class TransactionService {
     }
   }
 
-
-
   // Find transactions with pagination and optional filters
   static async findWithPagination(
     page: number, 
@@ -223,7 +221,8 @@ export class TransactionService {
     supplierId?: string,
     customerId?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    order: 'ASC' | 'DESC' = 'DESC'
   ): Promise<PaginatedTransactionResponse> {
     try {
       const offset = (page - 1) * limit;
@@ -274,14 +273,28 @@ export class TransactionService {
           {
             model: TransactionItem,
             as: 'transactionItems',
+            include: [
+              {
+                model: Item,
+                as: 'item',
+                attributes: ['display_name'],
+              },
+            ]
           },
           {
             model: TransactionExpense,
             as: 'transactionExpenses',
+            include: [
+              {
+                model: ExpenseType,
+                as: 'expenseType',
+                attributes: ['name']
+              }
+            ]
           }
         ],
         where: whereClause,
-        order: [['created_at', 'DESC']],
+        order: [['created_at', order]],
         limit,
         offset,
       });
