@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getDashboardData } from '../controllers/dashboardController';
-import { DashboardService } from '../services/dashboardService';
+import { getDashboardData } from '../controllers/dashboardController.js';
+import { DashboardService } from '../services/dashboardService.js';
 
 const router = Router();
 

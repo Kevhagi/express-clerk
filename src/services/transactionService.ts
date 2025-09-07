@@ -5,7 +5,6 @@ import {
   TransactionExpense, 
   Item, 
   ExpenseType,
-  Brand,
   sequelize
 } from '../models/index.js';
 import { Op } from 'sequelize';

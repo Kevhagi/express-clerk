@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { TransactionService } from '../services/transactionService';
+import { TransactionService } from '../services/transactionService.js';
 import { Transaction } from '../models/index.js';
 import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO } from '../types/index.js';
 

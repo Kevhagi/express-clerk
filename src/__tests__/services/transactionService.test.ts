@@ -1,6 +1,6 @@
-import { TransactionService } from '../../services/transactionService';
-import { Transaction, Contact, Item, ExpenseType, Brand } from '../../models';
-import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO, TransactionType } from '../../types';
+import { TransactionService } from '../../services/transactionService.js';
+import { Transaction, Contact, Item, ExpenseType, Brand } from '../../models/index.js';
+import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO, TransactionType } from '../../types/index.js';
 
 // Mock the models
 jest.mock('../../models', () => ({

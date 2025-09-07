@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import contactRoutes from './contactRoutes';
-import brandRoutes from './brandRoutes';
-import expenseTypeRoutes from './expenseTypeRoutes';
-import itemRoutes from './itemRoutes';
-import transactionRoutes from './transactionRoutes';
-import transactionItemRoutes from './transactionItemRoutes';
-import transactionExpenseRoutes from './transactionExpenseRoutes';
-import dashboardRoutes from './dashboardRoutes';
+import contactRoutes from './contactRoutes.js';
+import brandRoutes from './brandRoutes.js';
+import expenseTypeRoutes from './expenseTypeRoutes.js';
+import itemRoutes from './itemRoutes.js';
+import transactionRoutes from './transactionRoutes.js';
+import transactionItemRoutes from './transactionItemRoutes.js';
+import transactionExpenseRoutes from './transactionExpenseRoutes.js';
+import dashboardRoutes from './dashboardRoutes.js';
 
 const router = Router();
 

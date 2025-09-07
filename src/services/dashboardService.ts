@@ -1,5 +1,5 @@
-import { Op, fn, col, literal, QueryTypes } from 'sequelize';
-import { Transaction, TransactionExpense, sequelize } from '../models/index.js';
+import { QueryTypes } from 'sequelize';
+import { sequelize } from '../models/index.js';
 import { DashboardData, MetricData } from '../types/index.js';
 
 // Cache for dashboard data (5 minutes TTL)

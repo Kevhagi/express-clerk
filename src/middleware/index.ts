@@ -1,2 +1,2 @@
-export { clerkIdInjectorWithLogging } from './clerkIdInjector'
-export { performanceLogger } from './performanceLogger'
+export { clerkIdInjectorWithLogging } from './clerkIdInjector.js'
+export { performanceLogger } from './performanceLogger.js'

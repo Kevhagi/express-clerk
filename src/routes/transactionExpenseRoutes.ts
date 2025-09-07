@@ -5,7 +5,7 @@ import {
   createTransactionExpense,
   updateTransactionExpense,
   deleteTransactionExpense,
-} from '../controllers/transactionExpenseController';
+} from '../controllers/transactionExpenseController.js';
 
 const router = Router();
 

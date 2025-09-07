@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 
 /**
  * Middleware to log request execution time for performance monitoring

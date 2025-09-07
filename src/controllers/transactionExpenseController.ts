@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { TransactionExpense, Transaction, ExpenseType } from '../models/index.js';
-import { TransactionExpenseService } from '../services/transactionExpenseService';
+import { TransactionExpenseService } from '../services/transactionExpenseService.js';
 import { CreateTransactionExpenseDTO, UpdateTransactionExpenseDTO } from '../types/index.js';
 
 // GET /api/transaction-expenses - Get all transaction expenses with related data

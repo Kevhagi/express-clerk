@@ -1,10 +1,10 @@
 // Export all services
 
-export { ContactService } from './contactService';
-export { BrandService } from './brandService';
-export { ItemService } from './itemService';
-export { ExpenseTypeService } from './expenseTypeService';
-export { TransactionService } from './transactionService';
-export { TransactionItemService } from './transactionItemService';
-export { TransactionExpenseService } from './transactionExpenseService';
-export { DashboardService } from './dashboardService';
+export { ContactService } from './contactService.js';
+export { BrandService } from './brandService.js';
+export { ItemService } from './itemService.js';
+export { ExpenseTypeService } from './expenseTypeService.js';
+export { TransactionService } from './transactionService.js';
+export { TransactionItemService } from './transactionItemService.js';
+export { TransactionExpenseService } from './transactionExpenseService.js';
+export { DashboardService } from './dashboardService.js';

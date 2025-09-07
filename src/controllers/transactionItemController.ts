@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { TransactionItem, Transaction, Item, Brand } from '../models/index.js';
-import { TransactionItemService } from '../services/transactionItemService';
+import { TransactionItemService } from '../services/transactionItemService.js';
 import { CreateTransactionItemDTO, UpdateTransactionItemDTO } from '../types/index.js';
 
 // GET /api/transaction-items - Get all transaction items with related data

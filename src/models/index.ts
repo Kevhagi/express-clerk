@@ -1,11 +1,11 @@
 import sequelize from '../config/database.js';
-import Contact from './Contact';
-import Brand from './Brand';
-import Item from './Item';
-import ExpenseType from './ExpenseType';
-import Transaction from './Transaction';
-import TransactionItem from './TransactionItem';
-import TransactionExpense from './TransactionExpense';
+import Contact from './Contact.js';
+import Brand from './Brand.js';
+import Item from './Item.js';
+import ExpenseType from './ExpenseType.js';
+import Transaction from './Transaction.js';
+import TransactionItem from './TransactionItem.js';
+import TransactionExpense from './TransactionExpense.js';
 
 // Define associations
 

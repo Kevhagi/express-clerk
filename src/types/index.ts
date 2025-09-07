@@ -1,7 +1,7 @@
 
-export * from "./contact"
-export * from "./brand"
-export * from "./item"
-export * from "./transaction"
-export * from "./expense"
-export * from "./dashboard"
+export * from "./contact.js"
+export * from "./brand.js"
+export * from "./item.js"
+export * from "./transaction.js"
+export * from "./expense.js"
+export * from "./dashboard.js"
