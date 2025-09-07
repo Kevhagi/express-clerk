@@ -9,15 +9,35 @@ export const seedItems = async () => {
       return;
     }
 
-    // Fetch existing brands
+    // Fetch existing brands with explicit field selection
     console.log('📱 Fetching existing brands...');
     const createdBrands: { [key: string]: string } = {};
     
-    const allBrands = await Brand.findAll();
+    const allBrands = await Brand.findAll({
+      attributes: ['id', 'name'], // Explicitly select only id and name fields,
+      raw: true,
+    });
+    
+    console.log(`📊 Found ${allBrands.length} brands in database`);
+    
     for (const brand of allBrands) {
-      createdBrands[brand.name] = brand.id!;
-      console.log(`ℹ️  Found brand: ${brand.name} (ID: ${brand.id})`);
+      // Debug: log the raw brand object
+      console.log(`🔍 Raw brand object:`, JSON.stringify(brand, null, 2));
+      
+      if (brand.name && brand.id) {
+        createdBrands[brand.name] = brand.id;
+        console.log(`✅ Found brand: ${brand.name} (ID: ${brand.id})`);
+      } else {
+        console.error(`❌ Invalid brand data:`, brand.toJSON());
+      }
     }
+
+    // Check if we have any valid brands
+    if (Object.keys(createdBrands).length === 0) {
+      throw new Error('No valid brands found in database. Please seed brands first.');
+    }
+
+    console.log(`📋 Available brands: ${Object.keys(createdBrands).join(', ')}`);
 
     // Sample item data
     const items = [
@@ -242,7 +262,9 @@ export const seedItems = async () => {
       const brandId = createdBrands[brandName];
       
       if (!brandId) {
-        throw new Error(`Brand not found: ${brandName}`);
+        console.error(`❌ Brand not found: ${brandName}`);
+        console.error(`Available brands: ${Object.keys(createdBrands).join(', ')}`);
+        throw new Error(`Brand not found: ${brandName}. Available brands: ${Object.keys(createdBrands).join(', ')}`);
       }
       
       return {
