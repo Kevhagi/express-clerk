@@ -1,5 +1,5 @@
-import { TransactionItem, Transaction, Item, Brand } from '../models';
-import { ITransactionItem } from '../types';
+import { TransactionItem, Transaction, Item, Brand } from '../models/index.js';
+import { ITransactionItem } from '../types/index.js';
 
 export class TransactionItemService {
 

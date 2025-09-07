@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TransactionService } from '../services/transactionService';
-import { Transaction } from '../models';
-import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO } from '../types';
+import { Transaction } from '../models/index.js';
+import { CreateTransactionPayloadDTO, UpdateTransactionWithDetailsDTO } from '../types/index.js';
 
 // GET /api/transactions - Get all transactions with related data
 // Query parameters:

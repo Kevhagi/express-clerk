@@ -1,5 +1,5 @@
-import { ExpenseType } from '../models';
-import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO, IExpenseType } from '../types';
+import { ExpenseType } from '../models/index.js';
+import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO, IExpenseType } from '../types/index.js';
 
 export class ExpenseTypeService {
   // Create a new expense type

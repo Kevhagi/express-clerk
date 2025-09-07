@@ -1,4 +1,4 @@
-import { Contact } from '../models';
+import { Contact } from '../models/index.js';
 
 export const seedContacts = async () => {
   try {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { TransactionItem, Transaction, Item, Brand } from '../models';
+import { TransactionItem, Transaction, Item, Brand } from '../models/index.js';
 import { TransactionItemService } from '../services/transactionItemService';
-import { CreateTransactionItemDTO, UpdateTransactionItemDTO } from '../types';
+import { CreateTransactionItemDTO, UpdateTransactionItemDTO } from '../types/index.js';
 
 // GET /api/transaction-items - Get all transaction items with related data
 export const getAllTransactionItems = async (req: Request, res: Response): Promise<void> => {

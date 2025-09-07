@@ -1,5 +1,5 @@
-import { Item, Brand } from '../models';
-import { CreateItemDTO, UpdateItemDTO, IItem } from '../types';
+import { Item, Brand } from '../models/index.js';
+import { CreateItemDTO, UpdateItemDTO, IItem } from '../types/index.js';
 import { Op } from 'sequelize';
 
 export class ItemService {

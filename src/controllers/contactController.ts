@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ContactService } from '../services';
-import { CreateContactDTO, UpdateContactDTO } from '../types';
+import { ContactService } from '../services/index.js';
+import { CreateContactDTO, UpdateContactDTO } from '../types/index.js';
 
 // GET /api/contacts - Get all contacts with pagination and search
 export const getAllContacts = async (req: Request, res: Response): Promise<void> => {

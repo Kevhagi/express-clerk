@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
-import { IItem } from '../types';
+import sequelize from '../config/database.js';
+import { IItem } from '../types/index.js';
 
 class Item extends Model<IItem> implements IItem {
   public id!: string;

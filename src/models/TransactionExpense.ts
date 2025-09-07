@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
-import { ITransactionExpense } from '../types';
+import sequelize from '../config/database.js';
+import { ITransactionExpense } from '../types/index.js';
 
 class TransactionExpense extends Model<ITransactionExpense> implements ITransactionExpense {
   public id!: string;

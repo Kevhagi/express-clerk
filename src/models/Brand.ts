@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
-import { IBrand } from '../types';
+import sequelize from '../config/database.js';
+import { IBrand } from '../types/index.js';
 
 class Brand extends Model<IBrand> implements IBrand {
   public id!: string;

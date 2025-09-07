@@ -7,14 +7,14 @@ import {
   ExpenseType,
   Brand,
   sequelize
-} from '../models';
+} from '../models/index.js';
 import { Op } from 'sequelize';
 import { 
   CreateTransactionPayloadDTO,
   UpdateTransactionWithDetailsDTO,
   TransactionResponse,
   PaginatedTransactionResponse,
-} from '../types';
+} from '../types/index.js';
 
 export class TransactionService {
   // Helper function to convert date string to date-only format

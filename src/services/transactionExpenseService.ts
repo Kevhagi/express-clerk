@@ -1,5 +1,5 @@
-import { TransactionExpense, Transaction, ExpenseType } from '../models';
-import { ITransactionExpense } from '../types';
+import { TransactionExpense, Transaction, ExpenseType } from '../models/index.js';
+import { ITransactionExpense } from '../types/index.js';
 
 export class TransactionExpenseService {
 

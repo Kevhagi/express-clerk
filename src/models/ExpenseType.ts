@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
-import { IExpenseType } from '../types';
+import sequelize from '../config/database.js';
+import { IExpenseType } from '../types/index.js';
 
 class ExpenseType extends Model<IExpenseType> implements IExpenseType {
   public id!: string;

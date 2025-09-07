@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { BrandService } from '../services';
-import { CreateBrandDTO, UpdateBrandDTO } from '../types';
+import { BrandService } from '../services/index.js';
+import { CreateBrandDTO, UpdateBrandDTO } from '../types/index.js';
 
 // GET /api/brands - Get all brands
 export const getAllBrands = async (req: Request, res: Response): Promise<void> => {

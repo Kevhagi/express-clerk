@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { TransactionExpense, Transaction, ExpenseType } from '../models';
+import { TransactionExpense, Transaction, ExpenseType } from '../models/index.js';
 import { TransactionExpenseService } from '../services/transactionExpenseService';
-import { CreateTransactionExpenseDTO, UpdateTransactionExpenseDTO } from '../types';
+import { CreateTransactionExpenseDTO, UpdateTransactionExpenseDTO } from '../types/index.js';
 
 // GET /api/transaction-expenses - Get all transaction expenses with related data
 export const getAllTransactionExpenses = async (req: Request, res: Response): Promise<void> => {

@@ -2,15 +2,15 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { clerkMiddleware } from '@clerk/express'
-import { initDatabase } from './models'
-import apiRoutes from './routes'
-import { seedBrands } from './seeders/seedBrands'
-import { seedItems } from './seeders/seedItems'
-import { seedContacts } from './seeders/seedContacts'
+import { initDatabase } from './models/index.js'
+import apiRoutes from './routes/index.js'
+import { seedBrands } from './seeders/seedBrands.js'
+import { seedItems } from './seeders/seedItems.js'
+import { seedContacts } from './seeders/seedContacts.js'
 import { 
   clerkIdInjectorWithLogging, 
   performanceLogger
-} from './middleware'
+} from './middleware/index.js'
 
 const app = express()
 const PORT = process.env.PORT || 3002

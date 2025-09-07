@@ -1,5 +1,5 @@
-import { Brand } from '../models';
-import { CreateBrandDTO, UpdateBrandDTO, IBrand } from '../types';
+import { Brand } from '../models/index.js';
+import { CreateBrandDTO, UpdateBrandDTO, IBrand } from '../types/index.js';
 
 export class BrandService {
   // Create a new brand

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ExpenseTypeService } from '../services';
-import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO } from '../types';
+import { ExpenseTypeService } from '../services/index.js';
+import { CreateExpenseTypeDTO, UpdateExpenseTypeDTO } from '../types/index.js';
 
 // GET /api/expense-types - Get all expense types
 export const getAllExpenseTypes = async (req: Request, res: Response): Promise<void> => {

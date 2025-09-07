@@ -1,4 +1,4 @@
-import sequelize from '../config/database';
+import sequelize from '../config/database.js';
 import Contact from './Contact';
 import Brand from './Brand';
 import Item from './Item';

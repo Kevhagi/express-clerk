@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ItemService } from '../services';
-import { CreateItemDTO, UpdateItemDTO } from '../types';
+import { ItemService } from '../services/index.js';
+import { CreateItemDTO, UpdateItemDTO } from '../types/index.js';
 
 // GET /api/items - Get all items with brand information
 export const getAllItems = async (req: Request, res: Response): Promise<void> => {

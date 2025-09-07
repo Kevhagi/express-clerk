@@ -1,5 +1,4 @@
-import { initDatabase } from '../models';
-import { Brand } from '../models';
+import { initDatabase, Brand } from '../models/index.js';
 
 export const seedBrands = async () => {
   try {

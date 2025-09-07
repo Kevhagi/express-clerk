@@ -1,5 +1,5 @@
-import { Contact } from '../models';
-import { CreateContactDTO, UpdateContactDTO, IContact } from '../types';
+import { Contact } from '../models/index.js';
+import { CreateContactDTO, UpdateContactDTO, IContact } from '../types/index.js';
 import { Op } from 'sequelize';
 
 export class ContactService {

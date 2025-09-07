@@ -1,4 +1,4 @@
-import { Brand, Item } from '../models';
+import { Brand, Item } from '../models/index.js';
 
 export const seedItems = async () => {
   try {

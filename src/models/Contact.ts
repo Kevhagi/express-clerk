@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
-import { IContact } from '../types';
+import sequelize from '../config/database.js';
+import { IContact } from '../types/index.js';
 
 class Contact extends Model<IContact> implements IContact {
   public id!: string;
