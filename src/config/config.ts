@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import pg from 'pg';
 dotenv.config();
 
 // Check if we're using Supabase or traditional PostgreSQL
@@ -13,6 +14,7 @@ const config = {
     host: process.env.SUPABASE_DB_HOST,
     port: Number(process.env.SUPABASE_DB_PORT || 5432),
     dialect: "postgres",
+    dialectModule: pg,
     logging: false,
     dialectOptions: {
       ssl: {
@@ -33,6 +35,7 @@ const config = {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     dialect: "postgres",
+    dialectModule: pg,
     logging: false,
     dialectOptions: {
       ssl: {
