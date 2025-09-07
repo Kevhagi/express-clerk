@@ -107,15 +107,39 @@ const startServer = async () => {
       }
     }
     
-    // Start the server
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running at port ${PORT}`)
-      console.log(`💾 Database connected and models synchronized`)
-    })
+    console.log(`💾 Database connected and models synchronized`)
   } catch (error) {
     console.error('Failed to start server:', error)
-    process.exit(1)
+    throw error
   }
 }
 
-startServer()
+// For Vercel deployment, export the app and initialize database
+export default app
+
+// For local development, start the server
+if (process.env.NODE_ENV !== 'production') {
+  startServer().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running at port ${PORT}`)
+    })
+  }).catch((error) => {
+    console.error('Failed to start server:', error)
+    process.exit(1)
+  })
+} else {
+  // For production (Vercel), initialize database on first request
+  let dbInitialized = false
+  app.use(async (req, res, next) => {
+    if (!dbInitialized) {
+      try {
+        await startServer()
+        dbInitialized = true
+      } catch (error) {
+        console.error('Database initialization failed:', error)
+        return res.status(500).json({ error: 'Database initialization failed' })
+      }
+    }
+    next()
+  })
+}
